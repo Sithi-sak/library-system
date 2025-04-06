@@ -29,7 +29,6 @@ public class UsersPanel extends JPanel {
     private JComboBox<String> filterComboBox;
     
     // User action buttons
-    private JButton viewDetailsButton;
     private JButton toggleStatusButton;
     private JButton resetPasswordButton;
     
@@ -41,6 +40,12 @@ public class UsersPanel extends JPanel {
     private JLabel userRegisteredValueLabel;
     private JLabel userLastLoginValueLabel;
     
+    // User statistics labels
+    private JLabel totalBorrowedLabel;
+    private JLabel currentlyBorrowedLabel;
+    private JLabel overdueLabel;
+    private JLabel totalTransactionsLabel;
+    
     // Data access
     private final UserDAO userDAO;
     
@@ -48,9 +53,9 @@ public class UsersPanel extends JPanel {
     private User selectedUser;
     
     public UsersPanel() {
-        setLayout(new BorderLayout(15, 15));
+        setLayout(new BorderLayout(10, 10));
         setBackground(LaravelTheme.BACKGROUND_COLOR);
-        setBorder(new EmptyBorder(20, 20, 20, 20));
+        setBorder(new EmptyBorder(15, 15, 15, 15));
         
         // Initialize DAO
         userDAO = new UserDAO();
@@ -62,13 +67,27 @@ public class UsersPanel extends JPanel {
         JPanel headerPanel = createHeaderPanel();
         add(headerPanel, BorderLayout.NORTH);
         
-        // Main content panel - split view
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, userListPanel, userDetailsPanel);
-        splitPane.setDividerLocation(700);
-        splitPane.setResizeWeight(0.7);
-        splitPane.setBorder(null);
+        // Main content panel with GridBagLayout for better control
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
+        GridBagConstraints gbc = new GridBagConstraints();
         
-        add(splitPane, BorderLayout.CENTER);
+        // User list panel (left side - 65%)
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.65;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 0, 8);
+        mainPanel.add(userListPanel, gbc);
+        
+        // User details panel (right side - 35%)
+        gbc.gridx = 1;
+        gbc.weightx = 0.35;
+        gbc.insets = new Insets(0, 8, 0, 0);
+        mainPanel.add(userDetailsPanel, gbc);
+        
+        add(mainPanel, BorderLayout.CENTER);
         
         // Load initial data
         loadUserData();
@@ -104,14 +123,6 @@ public class UsersPanel extends JPanel {
                 applyFilter(selectedFilter);
             } else {
                 loadUserData(); // Reset to show all
-            }
-        });
-        
-        // View details button
-        viewDetailsButton.addActionListener(e -> {
-            int selectedRow = usersTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                showUserDetails(selectedRow);
             }
         });
         
@@ -169,7 +180,7 @@ public class UsersPanel extends JPanel {
         
         JButton searchButton = new JButton("Search");
         LaravelTheme.styleSecondaryButton(searchButton);
-        searchButton.setPreferredSize(new Dimension(80, 30));
+        searchButton.setPreferredSize(new Dimension(90, 30));
         
         searchPanel.add(filterComboBox);
         searchPanel.add(searchField);
@@ -181,11 +192,11 @@ public class UsersPanel extends JPanel {
     }
     
     private JPanel createUserListPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout(0, 10));
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
         // Table data model
@@ -193,7 +204,7 @@ public class UsersPanel extends JPanel {
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table cells non-editable
+                return false;
             }
         };
         
@@ -222,12 +233,12 @@ public class UsersPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         
         // Action buttons panel
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         actionPanel.setBackground(Color.WHITE);
-        actionPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, LaravelTheme.BORDER_GRAY));
-        
-        viewDetailsButton = new JButton("View Details");
-        LaravelTheme.styleSecondaryButton(viewDetailsButton);
+        actionPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, LaravelTheme.BORDER_GRAY),
+            BorderFactory.createEmptyBorder(10, 0, 0, 0)
+        ));
         
         toggleStatusButton = new JButton("Toggle Status");
         LaravelTheme.styleSecondaryButton(toggleStatusButton);
@@ -235,7 +246,6 @@ public class UsersPanel extends JPanel {
         resetPasswordButton = new JButton("Reset Password");
         LaravelTheme.styleSecondaryButton(resetPasswordButton);
         
-        actionPanel.add(viewDetailsButton);
         actionPanel.add(toggleStatusButton);
         actionPanel.add(resetPasswordButton);
         
@@ -246,20 +256,26 @@ public class UsersPanel extends JPanel {
     }
     
     private JPanel createUserDetailsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout(0, 0));
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
-        // Header
-        JLabel detailsTitle = new JLabel("User Details");
-        detailsTitle.setFont(new Font("Inter", Font.BOLD, 18));
-        detailsTitle.setForeground(LaravelTheme.TEXT_DARK);
-        detailsTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        // Create a top panel to hold all sections
+        JPanel topPanel = new JPanel(new BorderLayout(0, 0));
+        topPanel.setBackground(Color.WHITE);
         
-        // Details panel
+        // User Details Section
+        JPanel detailsSection = new JPanel(new BorderLayout(0, 0));
+        detailsSection.setBackground(Color.WHITE);
+        
+        JLabel detailsTitle = new JLabel("User Details");
+        detailsTitle.setFont(new Font("Inter", Font.BOLD, 16));
+        detailsTitle.setForeground(LaravelTheme.TEXT_DARK);
+        detailsTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+        
         JPanel detailsContent = new JPanel();
         detailsContent.setLayout(new BoxLayout(detailsContent, BoxLayout.Y_AXIS));
         detailsContent.setBackground(Color.WHITE);
@@ -272,31 +288,66 @@ public class UsersPanel extends JPanel {
         userRegisteredValueLabel = createValueLabel("");
         userLastLoginValueLabel = createValueLabel("");
         
-        // Add field rows
+        // Add field rows with minimal spacing
         detailsContent.add(createDetailRow("Name:", userNameValueLabel));
-        detailsContent.add(Box.createVerticalStrut(10));
+        detailsContent.add(Box.createVerticalStrut(4));
         detailsContent.add(createDetailRow("Email:", userEmailValueLabel));
-        detailsContent.add(Box.createVerticalStrut(10));
+        detailsContent.add(Box.createVerticalStrut(4));
         detailsContent.add(createDetailRow("Role:", userRoleValueLabel));
-        detailsContent.add(Box.createVerticalStrut(10));
+        detailsContent.add(Box.createVerticalStrut(4));
         detailsContent.add(createDetailRow("Status:", userStatusValueLabel));
-        detailsContent.add(Box.createVerticalStrut(10));
+        detailsContent.add(Box.createVerticalStrut(4));
         detailsContent.add(createDetailRow("Registered:", userRegisteredValueLabel));
-        detailsContent.add(Box.createVerticalStrut(10));
+        detailsContent.add(Box.createVerticalStrut(4));
         detailsContent.add(createDetailRow("Last Login:", userLastLoginValueLabel));
         
-        // User activity section
-        JPanel activityPanel = new JPanel(new BorderLayout());
+        detailsSection.add(detailsTitle, BorderLayout.NORTH);
+        detailsSection.add(detailsContent, BorderLayout.CENTER);
+        
+        // First separator
+        JSeparator firstSeparator = new JSeparator();
+        firstSeparator.setForeground(LaravelTheme.BORDER_GRAY);
+        JPanel firstSeparatorPanel = new JPanel(new BorderLayout());
+        firstSeparatorPanel.setBackground(Color.WHITE);
+        firstSeparatorPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+        firstSeparatorPanel.add(firstSeparator, BorderLayout.CENTER);
+        
+        // User Statistics Section
+        JPanel statsSection = new JPanel(new BorderLayout(0, 8));
+        statsSection.setBackground(Color.WHITE);
+        
+        JLabel statsTitle = new JLabel("User Statistics");
+        statsTitle.setFont(new Font("Inter", Font.BOLD, 16));
+        statsTitle.setForeground(LaravelTheme.TEXT_DARK);
+        
+        // Stats grid
+        JPanel statsGrid = new JPanel(new GridLayout(2, 2, 8, 8));
+        statsGrid.setBackground(Color.WHITE);
+        
+        // Add stat cards directly
+        statsGrid.add(createStatCard("Total Borrowed", "0"));
+        statsGrid.add(createStatCard("Currently Borrowed", "0"));
+        statsGrid.add(createStatCard("Overdue Books", "0"));
+        statsGrid.add(createStatCard("Total Transactions", "0"));
+        
+        statsSection.add(statsTitle, BorderLayout.NORTH);
+        statsSection.add(statsGrid, BorderLayout.CENTER);
+        
+        // Second separator
+        JSeparator secondSeparator = new JSeparator();
+        secondSeparator.setForeground(LaravelTheme.BORDER_GRAY);
+        JPanel secondSeparatorPanel = new JPanel(new BorderLayout());
+        secondSeparatorPanel.setBackground(Color.WHITE);
+        secondSeparatorPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+        secondSeparatorPanel.add(secondSeparator, BorderLayout.CENTER);
+        
+        // Recent Activity Section
+        JPanel activityPanel = new JPanel(new BorderLayout(0, 8));
         activityPanel.setBackground(Color.WHITE);
-        activityPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 0, 0, LaravelTheme.BORDER_GRAY),
-            BorderFactory.createEmptyBorder(15, 0, 0, 0)
-        ));
         
         JLabel activityTitle = new JLabel("Recent Activity");
         activityTitle.setFont(new Font("Inter", Font.BOLD, 16));
         activityTitle.setForeground(LaravelTheme.TEXT_DARK);
-        activityTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         
         DefaultListModel<String> activityModel = new DefaultListModel<>();
         activityModel.addElement("No activity data available");
@@ -311,24 +362,45 @@ public class UsersPanel extends JPanel {
         activityPanel.add(activityTitle, BorderLayout.NORTH);
         activityPanel.add(activityScroll, BorderLayout.CENTER);
         
-        panel.add(detailsTitle, BorderLayout.NORTH);
-        panel.add(detailsContent, BorderLayout.CENTER);
-        panel.add(activityPanel, BorderLayout.SOUTH);
+        // Add all sections to the top panel
+        JPanel sectionsPanel = new JPanel();
+        sectionsPanel.setLayout(new BoxLayout(sectionsPanel, BoxLayout.Y_AXIS));
+        sectionsPanel.setBackground(Color.WHITE);
+        
+        sectionsPanel.add(detailsSection);
+        sectionsPanel.add(firstSeparatorPanel);
+        sectionsPanel.add(statsSection);
+        sectionsPanel.add(secondSeparatorPanel);
+        
+        // Main panel layout
+        panel.add(sectionsPanel, BorderLayout.NORTH);
+        panel.add(activityPanel, BorderLayout.CENTER);
         
         return panel;
     }
     
     private JPanel createDetailRow(String label, JLabel valueLabel) {
-        JPanel panel = new JPanel(new BorderLayout(10, 0));
+        JPanel panel = new JPanel(new BorderLayout(8, 0));
         panel.setBackground(Color.WHITE);
         
         JLabel labelComponent = new JLabel(label);
         labelComponent.setFont(new Font("Inter", Font.BOLD, 13));
         labelComponent.setForeground(LaravelTheme.TEXT_DARK);
-        labelComponent.setPreferredSize(new Dimension(100, labelComponent.getPreferredSize().height));
+        labelComponent.setPreferredSize(new Dimension(80, labelComponent.getPreferredSize().height));
+        
+        // Create a fixed-width panel for the value
+        JPanel valuePanel = new JPanel(new BorderLayout());
+        valuePanel.setBackground(Color.WHITE);
+        valuePanel.setPreferredSize(new Dimension(200, valueLabel.getPreferredSize().height));
+        valuePanel.add(valueLabel, BorderLayout.WEST); // Align text to the left
         
         panel.add(labelComponent, BorderLayout.WEST);
-        panel.add(valueLabel, BorderLayout.CENTER);
+        panel.add(valuePanel, BorderLayout.CENTER);
+        
+        // Fix the height of the row
+        int height = Math.max(labelComponent.getPreferredSize().height, valueLabel.getPreferredSize().height);
+        panel.setPreferredSize(new Dimension(panel.getPreferredSize().width, height));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
         
         return panel;
     }
@@ -337,7 +409,49 @@ public class UsersPanel extends JPanel {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Inter", Font.PLAIN, 13));
         label.setForeground(LaravelTheme.TEXT_DARK);
+        // Fix the size of the label
+        Dimension preferredSize = label.getPreferredSize();
+        label.setPreferredSize(new Dimension(200, preferredSize.height));
+        label.setMinimumSize(new Dimension(0, preferredSize.height));
+        label.setMaximumSize(new Dimension(200, preferredSize.height));
         return label;
+    }
+    
+    private JPanel createStatCard(String title, String value) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
+            BorderFactory.createEmptyBorder(8, 8, 8, 8)
+        ));
+        
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Inter", Font.BOLD, 12));
+        titleLabel.setForeground(LaravelTheme.TEXT_DARK);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("Inter", Font.BOLD, 20));
+        valueLabel.setForeground(LaravelTheme.PRIMARY_RED);
+        valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        valueLabel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
+        
+        // Store reference to value label
+        if (title.equals("Total Borrowed")) {
+            totalBorrowedLabel = valueLabel;
+        } else if (title.equals("Currently Borrowed")) {
+            currentlyBorrowedLabel = valueLabel;
+        } else if (title.equals("Overdue Books")) {
+            overdueLabel = valueLabel;
+        } else if (title.equals("Total Transactions")) {
+            totalTransactionsLabel = valueLabel;
+        }
+        
+        card.add(titleLabel);
+        card.add(valueLabel);
+        
+        return card;
     }
     
     private void showUserDetails(int selectedRow) {
@@ -369,6 +483,12 @@ public class UsersPanel extends JPanel {
                 
                 // Update button text based on status
                 toggleStatusButton.setText(status.equalsIgnoreCase("Active") ? "Deactivate User" : "Activate User");
+                
+                // Update user statistics (these would be fetched from the database in a real implementation)
+                totalBorrowedLabel.setText("15");
+                currentlyBorrowedLabel.setText("3");
+                overdueLabel.setText("1");
+                totalTransactionsLabel.setText("25");
                 
                 break;
             }
