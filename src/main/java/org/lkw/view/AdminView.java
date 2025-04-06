@@ -5,6 +5,7 @@ import org.lkw.data.util.LaravelTheme;
 import org.lkw.model.User;
 import org.lkw.view.admin.DashboardPanel;
 import org.lkw.view.admin.UsersPanel;
+import org.lkw.view.admin.BooksPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -34,6 +35,7 @@ public class AdminView extends JFrame {
     // Panels
     private final DashboardPanel dashboardPanel;
     private UsersPanel usersPanel;
+    private BooksPanel booksPanel;
     
     // User info
     private User currentUser;
@@ -256,10 +258,25 @@ public class AdminView extends JFrame {
                 updateButtonStyle(activeButton, false);
                 updateButtonStyle(booksButton, true);
                 activeButton = booksButton;
+                
+                // Clear the content panel
+                contentPanel.removeAll();
+                
+                // Create the books panel if it doesn't exist
+                if (booksPanel == null) {
+                    booksPanel = new BooksPanel();
+                }
+                
+                // Add the books panel
+                contentPanel.add(booksPanel, "books");
+                
+                // Show the books panel
                 CardLayout cl = (CardLayout) contentPanel.getLayout();
-                // Will be implemented later
-                // cl.show(contentPanel, "books");
-                showPlaceholder("Books Management");
+                cl.show(contentPanel, "books");
+                
+                // Revalidate and repaint
+                contentPanel.revalidate();
+                contentPanel.repaint();
             }
         });
         
@@ -348,6 +365,13 @@ public class AdminView extends JFrame {
     public void maximizeIfNeeded(boolean shouldMaximize) {
         if (shouldMaximize) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+    }
+    
+    // Add this method to refresh the dashboard
+    public void refreshDashboard() {
+        if (dashboardPanel != null) {
+            dashboardPanel.updateDashboardData();
         }
     }
 } 
