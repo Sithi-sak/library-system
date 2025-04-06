@@ -18,22 +18,22 @@ public class LoginView extends JFrame {
     public LoginView() {
         // Set FlatLaf look and feel
         FlatLightLaf.setup();
-        
+
         // Set up the frame
         setTitle("Library Management - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         // Main panel with white background
         JPanel mainPanel = LaravelTheme.createPanel();
         mainPanel.setLayout(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
-        
+
         // Header
         JLabel headerLabel = new JLabel("Library System", JLabel.CENTER);
         LaravelTheme.styleTitle(headerLabel);
         headerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
         mainPanel.add(headerLabel, BorderLayout.NORTH);
-        
+
         // Form panel - using GridBagLayout for proper alignment
         JPanel formPanel = LaravelTheme.createPanel();
         formPanel.setLayout(new GridBagLayout());
@@ -42,100 +42,100 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(0, 0, 15, 0);
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1.0;
-        
+
         // Username field
         JLabel usernameLabel = new JLabel("Username");
         LaravelTheme.styleLabel(usernameLabel, false);
         gbc.insets = new Insets(0, 0, 4, 0);
         formPanel.add(usernameLabel, gbc);
-        
+
         usernameField = new JTextField();
         LaravelTheme.styleTextField(usernameField);
         gbc.insets = new Insets(0, 0, 15, 0);
         formPanel.add(usernameField, gbc);
-        
+
         // Password field
         JLabel passwordLabel = new JLabel("Password");
         LaravelTheme.styleLabel(passwordLabel, false);
         gbc.insets = new Insets(0, 0, 4, 0);
         formPanel.add(passwordLabel, gbc);
-        
+
         passwordField = new JPasswordField();
         LaravelTheme.stylePasswordField(passwordField);
         gbc.insets = new Insets(0, 0, 15, 0);
         formPanel.add(passwordField, gbc);
-        
+
         // Role selection
         JLabel roleLabel = new JLabel("Login as");
         LaravelTheme.styleLabel(roleLabel, false);
         gbc.insets = new Insets(0, 0, 4, 0);
         formPanel.add(roleLabel, gbc);
-        
+
         String[] roles = {"member", "admin"};
         roleComboBox = new JComboBox<>(roles);
         LaravelTheme.styleComboBox(roleComboBox);
         gbc.insets = new Insets(0, 0, 20, 0);
         formPanel.add(roleComboBox, gbc);
-        
+
         // Button panel
         JPanel buttonPanel = LaravelTheme.createPanel();
         buttonPanel.setLayout(new GridLayout(1, 2, 12, 0));
-        
+
         loginButton = new JButton("Login");
         LaravelTheme.stylePrimaryButton(loginButton);
-        
+
         registerButton = new JButton("Register");
         LaravelTheme.styleSecondaryButton(registerButton);
-        
+
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
         gbc.insets = new Insets(0, 0, 0, 0);
         formPanel.add(buttonPanel, gbc);
-        
+
         // Add form to main panel with center alignment
         mainPanel.add(formPanel, BorderLayout.CENTER);
-        
+
         // Set the content pane
         setContentPane(mainPanel);
-        
+
         // Size and center the window
         pack();
         setLocationRelativeTo(null);
     }
-    
+
     public String getUsername() {
         return usernameField.getText();
     }
-    
+
     public String getPassword() {
         return new String(passwordField.getPassword());
     }
-    
+
     public String getSelectedRole() {
         return (String) roleComboBox.getSelectedItem();
     }
-    
+
     public void clearFields() {
         usernameField.setText("");
         passwordField.setText("");
     }
-    
+
     public void setLoginActionListener(ActionListener listener) {
         loginButton.addActionListener(listener);
     }
-    
+
     public void setRegisterActionListener(ActionListener listener) {
         registerButton.addActionListener(listener);
     }
-    
+
     public void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
-    
+
     public void showSuccess(String message) {
         JOptionPane.showMessageDialog(this, message, "Success", JOptionPane.INFORMATION_MESSAGE);
     }
-    
+
     public boolean isWindowMaximized() {
         return (getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH;
     }
