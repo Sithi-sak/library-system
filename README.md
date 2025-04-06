@@ -1,4 +1,4 @@
-# Lost and Found Mobile App
+# Library Management System
 
 ## Table of Contents
 - [Overview](#overview)
@@ -8,7 +8,7 @@
 - [License](#license)
 
 ## Overview
-An Android-based Lost and Found app design to help user find their lost precious items by uploading the lost items on the platform that other user can help find your lost item.
+A Java Desktop program design to help librarians manage and keep track of books in the library.
 
 ## Technologies and Tools
 
@@ -25,13 +25,7 @@ An Android-based Lost and Found app design to help user find their lost precious
 
 To set up and run this project, ensure you have:
 
-- **Android Studio**: Latest stable version
-- **Gradle**: 8.9 (managed via Gradle wrapper)
-- **Android SDK**:
-    - SDK Platform 34 (or 35 if available)
-    - Build Tools 34.0.0 (or 35.0.0)
-    - Minimum SDK: 24
-    - Target SDK: 34 (or 35)
+- **IntelliJ**: Latest stable version
 - **Java**: JDK 11
 
 ## Get started
