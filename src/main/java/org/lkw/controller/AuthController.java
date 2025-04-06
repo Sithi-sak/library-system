@@ -3,9 +3,10 @@ package org.lkw.controller;
 import org.lkw.data.dao.UserDAO;
 import org.lkw.data.util.PasswordUtils;
 import org.lkw.model.User;
+import org.lkw.view.AdminView;
 import org.lkw.view.LoginView;
-import org.lkw.view.RegisterView;
 import org.lkw.view.MainView;
+import org.lkw.view.RegisterView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,17 +55,36 @@ public class AuthController {
                 // Check if login window was maximized
                 boolean wasMaximized = loginView.isWindowMaximized();
                 
-                // Open welcome screen
-                mainView = new MainView();
-                mainView.setUser(user);
-                mainView.setLogoutActionListener(e1 -> logout());
-                
-                // Apply maximized state if needed
-                if (wasMaximized) {
-                    mainView.maximizeIfNeeded(true);
+                // Open appropriate view based on role
+                if ("admin".equalsIgnoreCase(user.getRole())) {
+                    // Open admin view for admin users
+                    AdminView adminView = new AdminView();
+                    adminView.setUser(user);
+                    adminView.setLogoutActionListener(e1 -> {
+                        adminView.dispose();
+                        loginView.clearFields();
+                        loginView.setVisible(true);
+                    });
+                    
+                    // Apply maximized state if needed
+                    if (wasMaximized) {
+                        adminView.maximizeIfNeeded(true);
+                    }
+                    
+                    adminView.setVisible(true);
+                } else {
+                    // Open member view for regular users
+                    mainView = new MainView();
+                    mainView.setUser(user);
+                    mainView.setLogoutActionListener(e1 -> logout());
+                    
+                    // Apply maximized state if needed
+                    if (wasMaximized) {
+                        mainView.maximizeIfNeeded(true);
+                    }
+                    
+                    mainView.setVisible(true);
                 }
-                
-                mainView.setVisible(true);
             } else {
                 // Login failed
                 loginView.showError("Invalid username, password, or role. Please try again or register if you don't have an account.");
