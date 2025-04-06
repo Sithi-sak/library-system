@@ -7,6 +7,7 @@ import org.lkw.view.admin.DashboardPanel;
 import org.lkw.view.admin.UsersPanel;
 import org.lkw.view.admin.BooksPanel;
 import org.lkw.view.admin.SettingsPanel;
+import org.lkw.view.admin.TransactionsPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -38,6 +39,7 @@ public class AdminView extends JFrame {
     private UsersPanel usersPanel;
     private BooksPanel booksPanel;
     private SettingsPanel settingsPanel;
+    private TransactionsPanel transactionsPanel;
     
     // User info
     private User currentUser;
@@ -288,10 +290,25 @@ public class AdminView extends JFrame {
                 updateButtonStyle(activeButton, false);
                 updateButtonStyle(transactionsButton, true);
                 activeButton = transactionsButton;
+                
+                // Clear the content panel
+                contentPanel.removeAll();
+                
+                // Create the transactions panel if it doesn't exist
+                if (transactionsPanel == null) {
+                    transactionsPanel = new TransactionsPanel();
+                }
+                
+                // Add the transactions panel
+                contentPanel.add(transactionsPanel, "transactions");
+                
+                // Show the transactions panel
                 CardLayout cl = (CardLayout) contentPanel.getLayout();
-                // Will be implemented later
-                // cl.show(contentPanel, "transactions");
-                showPlaceholder("Transactions Management");
+                cl.show(contentPanel, "transactions");
+                
+                // Revalidate and repaint
+                contentPanel.revalidate();
+                contentPanel.repaint();
             }
         });
         
