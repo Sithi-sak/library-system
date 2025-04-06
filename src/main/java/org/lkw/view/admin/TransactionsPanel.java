@@ -40,7 +40,7 @@ public class TransactionsPanel extends JPanel {
         
         // Create table
         tableModel = new DefaultTableModel(
-            new String[]{"ID", "Date", "Type", "Member", "Book", "Due Date", "Status", "Fine"},
+            new String[]{"Transaction ID", "Book ID", "User ID", "Borrow Date", "Due Date", "Return Date", "Status", "Fine Amount"},
             0
         ) {
             @Override
@@ -141,14 +141,14 @@ public class TransactionsPanel extends JPanel {
         transactionsTable.setFont(new Font("Inter", Font.PLAIN, 13));
         
         // Set column widths
-        transactionsTable.getColumnModel().getColumn(0).setPreferredWidth(60);  // ID
-        transactionsTable.getColumnModel().getColumn(1).setPreferredWidth(120); // Date
-        transactionsTable.getColumnModel().getColumn(2).setPreferredWidth(80);  // Type
-        transactionsTable.getColumnModel().getColumn(3).setPreferredWidth(120); // Member
-        transactionsTable.getColumnModel().getColumn(4).setPreferredWidth(200); // Book
-        transactionsTable.getColumnModel().getColumn(5).setPreferredWidth(100); // Due Date
-        transactionsTable.getColumnModel().getColumn(6).setPreferredWidth(80);  // Status
-        transactionsTable.getColumnModel().getColumn(7).setPreferredWidth(80);  // Fine
+        transactionsTable.getColumnModel().getColumn(0).setPreferredWidth(100);  // Transaction ID
+        transactionsTable.getColumnModel().getColumn(1).setPreferredWidth(80);   // Book ID
+        transactionsTable.getColumnModel().getColumn(2).setPreferredWidth(80);   // User ID
+        transactionsTable.getColumnModel().getColumn(3).setPreferredWidth(120);  // Borrow Date
+        transactionsTable.getColumnModel().getColumn(4).setPreferredWidth(120);  // Due Date
+        transactionsTable.getColumnModel().getColumn(5).setPreferredWidth(120);  // Return Date
+        transactionsTable.getColumnModel().getColumn(6).setPreferredWidth(80);   // Status
+        transactionsTable.getColumnModel().getColumn(7).setPreferredWidth(100);  // Fine Amount
     }
     
     private JPanel createDetailsPanel() {
@@ -189,43 +189,24 @@ public class TransactionsPanel extends JPanel {
         contentPanel.setBorder(new EmptyBorder(0, 15, 15, 15));
         
         // Get data from selected row
-        String id = tableModel.getValueAt(selectedRow, 0).toString();
-        String date = tableModel.getValueAt(selectedRow, 1).toString();
-        String type = tableModel.getValueAt(selectedRow, 2).toString();
-        String member = tableModel.getValueAt(selectedRow, 3).toString();
-        String book = tableModel.getValueAt(selectedRow, 4).toString();
-        String dueDate = tableModel.getValueAt(selectedRow, 5).toString();
+        String transactionId = tableModel.getValueAt(selectedRow, 0).toString();
+        String bookId = tableModel.getValueAt(selectedRow, 1).toString();
+        String userId = tableModel.getValueAt(selectedRow, 2).toString();
+        String borrowDate = tableModel.getValueAt(selectedRow, 3).toString();
+        String dueDate = tableModel.getValueAt(selectedRow, 4).toString();
+        String returnDate = tableModel.getValueAt(selectedRow, 5).toString();
         String status = tableModel.getValueAt(selectedRow, 6).toString();
-        String fine = tableModel.getValueAt(selectedRow, 7).toString();
+        String fineAmount = tableModel.getValueAt(selectedRow, 7).toString();
         
         // Add details
-        addDetailRow(contentPanel, "Transaction ID:", id);
-        addDetailRow(contentPanel, "Date:", date);
-        addDetailRow(contentPanel, "Type:", type);
-        addDetailRow(contentPanel, "Member:", member);
-        addDetailRow(contentPanel, "Book:", book);
+        addDetailRow(contentPanel, "Transaction ID:", transactionId);
+        addDetailRow(contentPanel, "Book ID:", bookId);
+        addDetailRow(contentPanel, "User ID:", userId);
+        addDetailRow(contentPanel, "Borrow Date:", borrowDate);
         addDetailRow(contentPanel, "Due Date:", dueDate);
+        addDetailRow(contentPanel, "Return Date:", returnDate);
         addDetailRow(contentPanel, "Status:", status);
-        addDetailRow(contentPanel, "Fine:", fine);
-        
-        // Add action buttons if needed (e.g., for pending transactions)
-        if (status.equals("Pending")) {
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            buttonPanel.setBackground(Color.WHITE);
-            buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            
-            JButton approveButton = new JButton("Approve");
-            JButton rejectButton = new JButton("Reject");
-            
-            LaravelTheme.stylePrimaryButton(approveButton);
-            LaravelTheme.styleSecondaryButton(rejectButton);
-            
-            buttonPanel.add(approveButton);
-            buttonPanel.add(rejectButton);
-            
-            contentPanel.add(Box.createVerticalStrut(15));
-            contentPanel.add(buttonPanel);
-        }
+        addDetailRow(contentPanel, "Fine Amount:", fineAmount);
         
         // Update the details panel
         detailsPanel.removeAll();
@@ -263,22 +244,6 @@ public class TransactionsPanel extends JPanel {
     private void loadTransactions() {
         // Clear existing data
         tableModel.setRowCount(0);
-        
-        // Add sample data (replace with actual data from database)
-        addSampleData();
-    }
-    
-    private void addSampleData() {
-        // Add some sample transactions
-        Object[][] sampleData = {
-            {"TR001", dateFormat.format(new Date()), "Borrow", "John Doe", "The Great Gatsby", "Apr 20, 2024", "Active", "-"},
-            {"TR002", dateFormat.format(new Date()), "Return", "Jane Smith", "1984", "-", "Completed", "-"},
-            {"TR003", dateFormat.format(new Date()), "Fine Payment", "Mike Johnson", "Lord of the Rings", "-", "Completed", "$5.00"},
-            {"TR004", dateFormat.format(new Date()), "Borrow", "Sarah Wilson", "Pride and Prejudice", "Apr 18, 2024", "Overdue", "$2.50"}
-        };
-        
-        for (Object[] row : sampleData) {
-            tableModel.addRow(row);
-        }
+        // Data will be loaded from database
     }
 } 
