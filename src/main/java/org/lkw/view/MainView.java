@@ -5,6 +5,7 @@ import org.lkw.data.util.LaravelTheme;
 import org.lkw.model.User;
 import org.lkw.view.user.UserSettingsPanel;
 import org.lkw.view.user.UserDashboardPanel;
+import org.lkw.view.user.UserBooksPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -228,11 +229,10 @@ public class MainView extends JFrame {
         contentPanel.removeAll();
         contentPanel.setLayout(new BorderLayout());
         
-        JLabel booksLabel = new JLabel("Books Content");
-        booksLabel.setFont(new Font("Inter", Font.BOLD, 24));
-        booksLabel.setForeground(LaravelTheme.TEXT_DARK);
+        // Create and add the UserBooksPanel
+        UserBooksPanel booksPanel = new UserBooksPanel();
+        contentPanel.add(booksPanel, BorderLayout.CENTER);
         
-        contentPanel.add(booksLabel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
@@ -305,6 +305,43 @@ public class MainView extends JFrame {
 
         // Show the dashboard after user is set
         showDashboardContent();
+
+        // Set up button actions
+        dashboardButton.addActionListener(e -> {
+            if (activeButton != dashboardButton) {
+                updateButtonStyle(activeButton, false);
+                updateButtonStyle(dashboardButton, true);
+                activeButton = dashboardButton;
+                showDashboardContent();
+            }
+        });
+
+        booksButton.addActionListener(e -> {
+            if (activeButton != booksButton) {
+                updateButtonStyle(activeButton, false);
+                updateButtonStyle(booksButton, true);
+                activeButton = booksButton;
+                showBooksContent();
+            }
+        });
+
+        transactionsButton.addActionListener(e -> {
+            if (activeButton != transactionsButton) {
+                updateButtonStyle(activeButton, false);
+                updateButtonStyle(transactionsButton, true);
+                activeButton = transactionsButton;
+                showTransactionsContent();
+            }
+        });
+
+        settingButton.addActionListener(e -> {
+            if (activeButton != settingButton) {
+                updateButtonStyle(activeButton, false);
+                updateButtonStyle(settingButton, true);
+                activeButton = settingButton;
+                showSettingsContent();
+            }
+        });
     }
     
     // Additional content display method for Users
