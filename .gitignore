@@ -1,0 +1,90 @@
+# Compiled class files
+*.class
+
+# Build directories
+/build/
+/bin/
+/target/
+/out/
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDE-specific files and directories
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# Eclipse
+.metadata
+.classpath
+.project
+.settings/
+bin/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# VSCode
+.vscode/
+.code-workspace
+
+# Maven
+log/
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+*.log
+logs/
+log/
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files that may contain sensitive information
+src/main/resources/application.properties
+src/main/resources/application.yml
+src/main/resources/application-*.properties
+src/main/resources/application-*.yml
+
+# Exception: Include gradle wrapper jar
+!gradle-wrapper.jar
+
+# Exception: Include specific library jars if needed
+# !lib/*.jar
