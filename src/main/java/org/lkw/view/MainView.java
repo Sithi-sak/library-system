@@ -3,6 +3,7 @@ package org.lkw.view;
 import com.formdev.flatlaf.FlatLightLaf;
 import org.lkw.data.util.LaravelTheme;
 import org.lkw.model.User;
+import org.lkw.view.user.UserSettingsPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -293,11 +294,9 @@ public class MainView extends JFrame {
         contentPanel.removeAll();
         contentPanel.setLayout(new BorderLayout());
         
-        JLabel settingsLabel = new JLabel("Settings Content");
-        settingsLabel.setFont(new Font("Inter", Font.BOLD, 24));
-        settingsLabel.setForeground(LaravelTheme.TEXT_DARK);
+        UserSettingsPanel settingsPanel = new UserSettingsPanel(currentUser);
+        contentPanel.add(settingsPanel, BorderLayout.CENTER);
         
-        contentPanel.add(settingsLabel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
