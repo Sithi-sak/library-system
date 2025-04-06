@@ -6,6 +6,7 @@ import org.lkw.model.User;
 import org.lkw.view.admin.DashboardPanel;
 import org.lkw.view.admin.UsersPanel;
 import org.lkw.view.admin.BooksPanel;
+import org.lkw.view.admin.SettingsPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -36,6 +37,7 @@ public class AdminView extends JFrame {
     private final DashboardPanel dashboardPanel;
     private UsersPanel usersPanel;
     private BooksPanel booksPanel;
+    private SettingsPanel settingsPanel;
     
     // User info
     private User currentUser;
@@ -299,10 +301,25 @@ public class AdminView extends JFrame {
                 updateButtonStyle(activeButton, false);
                 updateButtonStyle(settingButton, true);
                 activeButton = settingButton;
+                
+                // Clear the content panel
+                contentPanel.removeAll();
+                
+                // Create the settings panel if it doesn't exist
+                if (settingsPanel == null) {
+                    settingsPanel = new SettingsPanel();
+                }
+                
+                // Add the settings panel
+                contentPanel.add(settingsPanel, "settings");
+                
+                // Show the settings panel
                 CardLayout cl = (CardLayout) contentPanel.getLayout();
-                // Will be implemented later
-                // cl.show(contentPanel, "settings");
-                showPlaceholder("Settings");
+                cl.show(contentPanel, "settings");
+                
+                // Revalidate and repaint
+                contentPanel.revalidate();
+                contentPanel.repaint();
             }
         });
     }
