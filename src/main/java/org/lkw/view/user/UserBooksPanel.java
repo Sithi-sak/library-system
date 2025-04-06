@@ -12,6 +12,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.SimpleAttributeSet;
 
 public class UserBooksPanel extends JPanel {
     private static final int MIN_GRID_COLUMNS = 5;
@@ -309,35 +313,55 @@ public class UserBooksPanel extends JPanel {
             JLabel coverLabel = new JLabel(new ImageIcon(scaledImage));
             coverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             contentWrapper.add(coverLabel);
-            contentWrapper.add(Box.createVerticalStrut(8));
+            contentWrapper.add(Box.createVerticalStrut(16));  // Consistent spacing after cover
         }
 
-        // Title and author section
+        // Title and author section with fixed width wrapper
+        JPanel titleAuthorWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        titleAuthorWrapper.setBackground(Color.WHITE);
+        titleAuthorWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
         JPanel titleAuthorPanel = new JPanel();
         titleAuthorPanel.setLayout(new BoxLayout(titleAuthorPanel, BoxLayout.Y_AXIS));
         titleAuthorPanel.setBackground(Color.WHITE);
         titleAuthorPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleAuthorPanel.setBorder(new EmptyBorder(16, 0, 8, 0));
+        titleAuthorPanel.setBorder(null);
 
-        JTextArea titleArea = new JTextArea(book.getTitle());
-        titleArea.setFont(new Font("Inter", Font.BOLD, 16));
-        titleArea.setLineWrap(true);
-        titleArea.setWrapStyleWord(true);
-        titleArea.setEditable(false);
-        titleArea.setBackground(Color.WHITE);
-        titleArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleArea.setBorder(null);
-        titleArea.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, Integer.MAX_VALUE));
-
+        // Title with proper text wrapping and center alignment
+        JTextPane titlePane = new JTextPane();
+        titlePane.setText(book.getTitle());
+        titlePane.setFont(new Font("Inter", Font.BOLD, 16));
+        titlePane.setEditable(false);
+        titlePane.setBackground(Color.WHITE);
+        titlePane.setBorder(null);
+        
+        // Center align the text
+        StyledDocument doc = titlePane.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
+        
+        // Set size constraints
+        int titleWidth = 220;
+        titlePane.setSize(titleWidth, Short.MAX_VALUE);
+        int preferredHeight = titlePane.getPreferredSize().height;
+        titlePane.setPreferredSize(new Dimension(titleWidth, preferredHeight));
+        titlePane.setMaximumSize(new Dimension(titleWidth, preferredHeight));
+        
         JLabel authorLabel = new JLabel("by " + book.getAuthor());
         authorLabel.setFont(new Font("Inter", Font.PLAIN, 13));
         authorLabel.setForeground(LaravelTheme.MUTED_TEXT);
         authorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        titleAuthorPanel.add(titleArea);
+        titleAuthorPanel.add(titlePane);
         titleAuthorPanel.add(Box.createVerticalStrut(4));
         titleAuthorPanel.add(authorLabel);
-        contentWrapper.add(titleAuthorPanel);
+        
+        // Add the title-author panel to the fixed-width wrapper
+        titleAuthorWrapper.add(titleAuthorPanel);
+        
+        contentWrapper.add(titleAuthorWrapper);
+        contentWrapper.add(Box.createVerticalStrut(16));
 
         // Book info panel with minimal padding
         JPanel infoPanel = new JPanel();
@@ -366,17 +390,19 @@ public class UserBooksPanel extends JPanel {
             borrowButton.setFont(new Font("Inter", Font.BOLD, 13));
             borrowButton.setBackground(LaravelTheme.PRIMARY_RED);
             borrowButton.setForeground(Color.WHITE);
-            borrowButton.setBorder(new EmptyBorder(8, 16, 8, 16));
+            borrowButton.setBorder(new EmptyBorder(10, 0, 10, 0));  // Increased vertical padding
             borrowButton.setFocusPainted(false);
             borrowButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
             borrowButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            borrowButton.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, 40));  // Full width minus padding
+            borrowButton.setPreferredSize(new Dimension(DETAILS_PANEL_WIDTH - 24, 40));  // Same as maximum size
             borrowButton.addActionListener(e -> borrowBook(book));
             contentWrapper.add(borrowButton);
         } else {
             JPanel unavailablePanel = new JPanel();
             unavailablePanel.setBackground(new Color(254, 242, 242));
             unavailablePanel.setBorder(new EmptyBorder(8, 12, 8, 12));
-            unavailablePanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, 35));
+            unavailablePanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, 40));  // Match borrow button height
             
             JLabel unavailableLabel = new JLabel("Currently Unavailable");
             unavailableLabel.setFont(new Font("Inter", Font.BOLD, 13));
