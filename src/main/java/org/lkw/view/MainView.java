@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import org.lkw.data.util.LaravelTheme;
 import org.lkw.model.User;
 import org.lkw.view.user.UserSettingsPanel;
+import org.lkw.view.user.UserDashboardPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -175,9 +176,6 @@ public class MainView extends JFrame {
         contentPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        // Create a welcome content initially
-        showDashboardContent();
-        
         // Add components to content area
         contentAreaPanel.add(searchPanel, BorderLayout.NORTH);
         contentAreaPanel.add(contentPanel, BorderLayout.CENTER);
@@ -252,14 +250,17 @@ public class MainView extends JFrame {
     
     // Content display methods
     private void showDashboardContent() {
+        if (currentUser == null) {
+            return; // Don't show dashboard if user is not set
+        }
+
         contentPanel.removeAll();
         contentPanel.setLayout(new BorderLayout());
         
-        JLabel welcomeLabel = new JLabel("Dashboard Content");
-        welcomeLabel.setFont(new Font("Inter", Font.BOLD, 24));
-        welcomeLabel.setForeground(LaravelTheme.TEXT_DARK);
+        // Create and add the UserDashboardPanel
+        UserDashboardPanel dashboardPanel = new UserDashboardPanel(currentUser);
+        contentPanel.add(dashboardPanel, BorderLayout.CENTER);
         
-        contentPanel.add(welcomeLabel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
@@ -301,7 +302,7 @@ public class MainView extends JFrame {
         contentPanel.repaint();
     }
     
-    // Set user info
+    // Set user info and initialize dashboard
     public void setUser(User user) {
         this.currentUser = user;
         usernameLabel.setText(user.getUsername());
@@ -342,6 +343,9 @@ public class MainView extends JFrame {
             menuPanel.revalidate();
             menuPanel.repaint();
         }
+
+        // Show the dashboard after user is set
+        showDashboardContent();
     }
     
     // Additional content display method for Users
