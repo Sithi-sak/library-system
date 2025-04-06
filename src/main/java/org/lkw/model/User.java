@@ -105,4 +105,12 @@ public class User {
     public void setLastLogin(String lastLogin) {
         this.lastLogin = lastLogin;
     }
+
+    public String getName() {
+        return fullName;
+    }
+
+    public void setName(String name) {
+        this.fullName = name;
+    }
 } 
