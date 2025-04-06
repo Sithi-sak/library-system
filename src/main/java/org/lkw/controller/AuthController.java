@@ -49,7 +49,6 @@ public class AuthController {
             
             if (user != null && user.getRole().equals(role)) {
                 // Login successful
-                loginView.showSuccess("Login successful!");
                 loginView.setVisible(false);
                 
                 // Check if login window was maximized
