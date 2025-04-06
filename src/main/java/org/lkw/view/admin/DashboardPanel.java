@@ -1,14 +1,18 @@
 package org.lkw.view.admin;
 
 import org.lkw.data.dao.UserDAO;
+import org.lkw.data.dao.BookDAO;
 import org.lkw.data.util.LaravelTheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Dashboard panel for admin users displaying library statistics and quick actions
@@ -370,17 +374,60 @@ public class DashboardPanel extends JPanel {
     public void updateDashboardData() {
         // Get real data from the database
         UserDAO userDAO = new UserDAO();
+        BookDAO bookDAO = new BookDAO();
         
         // Count members (only users with role 'member')
         int totalMembers = userDAO.countUsersByRole("member");
         totalMembersValueLabel.setText(String.valueOf(totalMembers));
         
-        // For now, using dummy data for book-related statistics
-        // These would be replaced with real data from BookDAO in a complete implementation
-        totalBooksValueLabel.setText("213");
-        borrowedBooksValueLabel.setText("78");
-        overdueBooksValueLabel.setText("5");
-        availableBooksValueLabel.setText("135");
-        newBooksValueLabel.setText("15");
+        // Get book statistics
+        int totalBooks = bookDAO.getTotalBooks();
+        int borrowedBooks = bookDAO.getBorrowedBooks();
+        int overdueBooks = bookDAO.getOverdueBooks();
+        int availableBooks = bookDAO.getAvailableBooks();
+        int newBooks = bookDAO.getNewBooks();
+        
+        totalBooksValueLabel.setText(String.valueOf(totalBooks));
+        borrowedBooksValueLabel.setText(String.valueOf(borrowedBooks));
+        overdueBooksValueLabel.setText(String.valueOf(overdueBooks));
+        availableBooksValueLabel.setText(String.valueOf(availableBooks));
+        newBooksValueLabel.setText(String.valueOf(newBooks));
+        
+        // Update recent activity
+        updateRecentActivity(bookDAO);
+    }
+    
+    private void updateRecentActivity(BookDAO bookDAO) {
+        // Get recent activities
+        List<Map<String, String>> activities = bookDAO.getRecentActivity(5);
+        
+        // Create table model for recent activities
+        String[] columnNames = {"Type", "Description", "Date"};
+        Object[][] data = new Object[activities.size()][3];
+        
+        for (int i = 0; i < activities.size(); i++) {
+            Map<String, String> activity = activities.get(i);
+            data[i][0] = activity.get("type");
+            data[i][1] = activity.get("description");
+            data[i][2] = activity.get("date");
+        }
+        
+        // If no activities, show a default message
+        if (activities.isEmpty()) {
+            data = new Object[][]{{"", "No recent activity", ""}};
+        }
+        
+        // Find the recent activity table and update its model
+        Component[] components = recentPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JScrollPane) {
+                JScrollPane scrollPane = (JScrollPane) component;
+                if (scrollPane.getViewport().getView() instanceof JTable) {
+                    JTable table = (JTable) scrollPane.getViewport().getView();
+                    table.setModel(new DefaultTableModel(data, columnNames));
+                    break;
+                }
+            }
+        }
     }
 } 
