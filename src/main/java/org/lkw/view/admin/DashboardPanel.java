@@ -32,13 +32,12 @@ public class DashboardPanel extends JPanel {
     private JLabel borrowedBooksValueLabel;
     private JLabel overdueBooksValueLabel;
     private JLabel availableBooksValueLabel;
-    private JLabel newMembersValueLabel;
     private JLabel newBooksValueLabel;
     
     public DashboardPanel() {
-        setLayout(new BorderLayout(15, 15));
+        setLayout(new BorderLayout(10, 10));
         setBackground(LaravelTheme.BACKGROUND_COLOR);
-        setBorder(new EmptyBorder(20, 20, 20, 20));
+        setBorder(new EmptyBorder(15, 15, 15, 15));
         
         // Initialize all panels
         initializePanels();
@@ -56,34 +55,39 @@ public class DashboardPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.65;
-        gbc.weighty = 0.6;
+        gbc.weighty = 0.45;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 0, 10, 10);
+        gbc.insets = new Insets(0, 0, 8, 8);
         mainPanel.add(statsPanel, gbc);
         
-        // Quick actions - top right
+        // Quick actions and Alerts - right column
+        JPanel rightPanel = new JPanel(new BorderLayout(0, 8)); // 8px gap between components
+        rightPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
+        
+        // Quick actions - top right (natural height)
+        rightPanel.add(quickActionsPanel, BorderLayout.NORTH);
+        
+        // Alerts - fills remaining space
+        rightPanel.add(alertsPanel, BorderLayout.CENTER);
+        
+        // Add right panel to main panel
         gbc.gridx = 1;
         gbc.gridy = 0;
+        gbc.gridheight = 2;
         gbc.weightx = 0.35;
-        gbc.weighty = 0.6;
-        gbc.insets = new Insets(0, 10, 10, 0);
-        mainPanel.add(quickActionsPanel, gbc);
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 8, 0, 0);
+        mainPanel.add(rightPanel, gbc);
         
         // Recent activity - bottom left
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridheight = 1;
         gbc.weightx = 0.65;
-        gbc.weighty = 0.4;
-        gbc.insets = new Insets(10, 0, 0, 10);
+        gbc.weighty = 0.55;
+        gbc.insets = new Insets(8, 0, 0, 8);
         mainPanel.add(recentPanel, gbc);
-        
-        // Alerts - bottom right
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 0.35;
-        gbc.weighty = 0.4;
-        gbc.insets = new Insets(10, 10, 0, 0);
-        mainPanel.add(alertsPanel, gbc);
         
         add(mainPanel, BorderLayout.CENTER);
         
@@ -108,7 +112,7 @@ public class DashboardPanel extends JPanel {
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(LaravelTheme.BACKGROUND_COLOR);
-        panel.setBorder(new EmptyBorder(0, 0, 15, 0));
+        panel.setBorder(new EmptyBorder(0, 0, 10, 0));
         
         JLabel titleLabel = new JLabel("Dashboard");
         titleLabel.setFont(new Font("Inter", Font.BOLD, 24));
@@ -127,16 +131,15 @@ public class DashboardPanel extends JPanel {
     
     private JPanel createStatsPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 3, 15, 15));
+        panel.setLayout(new GridLayout(2, 3, 8, 8)); // Changed to 2x3 grid
         panel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         
-        // Create stat cards
+        // Create stat cards in a more logical order
         panel.add(createStatCard("Total Members", "0", "users"));
         panel.add(createStatCard("Total Books", "0", "books"));
+        panel.add(createStatCard("Available Books", "0", "available"));
         panel.add(createStatCard("Borrowed Books", "0", "borrowed"));
         panel.add(createStatCard("Overdue Books", "0", "overdue"));
-        panel.add(createStatCard("Available Books", "0", "available"));
-        panel.add(createStatCard("New Members", "0", "new-users"));
         panel.add(createStatCard("New Books", "0", "new-books"));
         
         return panel;
@@ -148,7 +151,7 @@ public class DashboardPanel extends JPanel {
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
         JLabel titleLabel = new JLabel(title);
@@ -170,8 +173,6 @@ public class DashboardPanel extends JPanel {
             overdueBooksValueLabel = valueLabel;
         } else if ("available".equals(type)) {
             availableBooksValueLabel = valueLabel;
-        } else if ("new-users".equals(type)) {
-            newMembersValueLabel = valueLabel;
         } else if ("new-books".equals(type)) {
             newBooksValueLabel = valueLabel;
         }
@@ -188,31 +189,36 @@ public class DashboardPanel extends JPanel {
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
         JLabel titleLabel = new JLabel("Quick Actions");
         titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
         titleLabel.setForeground(LaravelTheme.TEXT_DARK);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new GridLayout(2, 1, 0, 10));
-        buttonsPanel.setBackground(Color.WHITE);
+        // Container for buttons with minimum spacing
+        JPanel buttonContainer = new JPanel();
+        buttonContainer.setLayout(new BoxLayout(buttonContainer, BoxLayout.Y_AXIS));
+        buttonContainer.setBackground(Color.WHITE);
         
         // Add book button
         addBookButton = new JButton("Add New Book");
         styleActionButton(addBookButton);
+        addBookButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, addBookButton.getPreferredSize().height));
         
         // View overdue button
         viewOverdueButton = new JButton("View Overdue Books");
         styleActionButton(viewOverdueButton);
+        viewOverdueButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, viewOverdueButton.getPreferredSize().height));
         
-        buttonsPanel.add(addBookButton);
-        buttonsPanel.add(viewOverdueButton);
+        // Add buttons to container with minimal spacing
+        buttonContainer.add(addBookButton);
+        buttonContainer.add(Box.createVerticalStrut(6)); // Reduced spacing between buttons
+        buttonContainer.add(viewOverdueButton);
         
         panel.add(titleLabel, BorderLayout.NORTH);
-        panel.add(buttonsPanel, BorderLayout.CENTER);
+        panel.add(buttonContainer, BorderLayout.CENTER);
         
         return panel;
     }
@@ -221,6 +227,12 @@ public class DashboardPanel extends JPanel {
         LaravelTheme.styleSecondaryButton(button);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setFont(new Font("Inter", Font.BOLD, 14));
+        // Make the button more compact
+        button.setBorder(BorderFactory.createCompoundBorder(
+            button.getBorder(),
+            BorderFactory.createEmptyBorder(4, 12, 4, 12) // Reduced vertical padding
+        ));
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
     }
     
     private JPanel createRecentActivityPanel() {
@@ -229,13 +241,13 @@ public class DashboardPanel extends JPanel {
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
         JLabel titleLabel = new JLabel("Recent Activity");
         titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
         titleLabel.setForeground(LaravelTheme.TEXT_DARK);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         
         // Create a model for recent activities
         String[] columnNames = {"Type", "Description", "Date"};
@@ -268,33 +280,56 @@ public class DashboardPanel extends JPanel {
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
         JLabel titleLabel = new JLabel("Alerts");
         titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
         titleLabel.setForeground(LaravelTheme.TEXT_DARK);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+        
+        // Use FlowLayout to align items to the left
+        JPanel outerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        outerPanel.setBackground(Color.WHITE);
         
         JPanel alertsListPanel = new JPanel();
         alertsListPanel.setLayout(new BoxLayout(alertsListPanel, BoxLayout.Y_AXIS));
         alertsListPanel.setBackground(Color.WHITE);
         
-        // Example alerts
-        alertsListPanel.add(createAlertItem("5 books are overdue", "warning"));
-        alertsListPanel.add(createAlertItem("3 new member registrations pending approval", "info"));
-        alertsListPanel.add(createAlertItem("Low inventory alert: 2 books with no copies left", "danger"));
+        // Example alerts with alignment wrappers
+        JPanel alert1 = createAlertItem("5 books are overdue", "warning");
+        JPanel alert1Wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        alert1Wrapper.setBackground(Color.WHITE);
+        alert1Wrapper.add(alert1);
+        
+        JPanel alert2 = createAlertItem("3 new member registrations pending approval", "info");
+        JPanel alert2Wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        alert2Wrapper.setBackground(Color.WHITE);
+        alert2Wrapper.add(alert2);
+        
+        JPanel alert3 = createAlertItem("Low inventory alert: 2 books with no copies left", "danger");
+        JPanel alert3Wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        alert3Wrapper.setBackground(Color.WHITE);
+        alert3Wrapper.add(alert3);
+        
+        // Add alerts to the vertical panel
+        alertsListPanel.add(alert1Wrapper);
+        alertsListPanel.add(Box.createVerticalStrut(8));
+        alertsListPanel.add(alert2Wrapper);
+        alertsListPanel.add(Box.createVerticalStrut(8));
+        alertsListPanel.add(alert3Wrapper);
+        
+        outerPanel.add(alertsListPanel);
         
         panel.add(titleLabel, BorderLayout.NORTH);
-        panel.add(alertsListPanel, BorderLayout.CENTER);
+        panel.add(outerPanel, BorderLayout.CENTER);
         
         return panel;
     }
     
     private JPanel createAlertItem(String message, String type) {
-        JPanel alertPanel = new JPanel(new BorderLayout(10, 0));
+        JPanel alertPanel = new JPanel(new BorderLayout(6, 0));
         alertPanel.setBackground(Color.WHITE);
-        alertPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         
         JLabel iconLabel = new JLabel("•");
         iconLabel.setFont(new Font("Inter", Font.BOLD, 18));
@@ -339,10 +374,6 @@ public class DashboardPanel extends JPanel {
         // Count members (only users with role 'member')
         int totalMembers = userDAO.countUsersByRole("member");
         totalMembersValueLabel.setText(String.valueOf(totalMembers));
-        
-        // Count new members in the last 30 days
-        int newMembers = userDAO.countNewMembersInLastDays(30);
-        newMembersValueLabel.setText(String.valueOf(newMembers));
         
         // For now, using dummy data for book-related statistics
         // These would be replaced with real data from BookDAO in a complete implementation
