@@ -23,7 +23,6 @@ public class MainView extends JFrame {
     private final JButton transactionsButton;
     private final JButton settingButton;
     private final JButton logoutButton;
-    private final JTextField searchField;
     private final JPanel contentPanel;
     
     // Optional admin-only buttons
@@ -132,52 +131,12 @@ public class MainView extends JFrame {
         JPanel contentAreaPanel = new JPanel(new BorderLayout());
         contentAreaPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         
-        // Search panel at the top
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.setBackground(Color.WHITE);
-        searchPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, LaravelTheme.BORDER_GRAY));
-        searchPanel.setPreferredSize(new Dimension(contentAreaPanel.getWidth(), 60));
-        
-        // Create search field
-        searchField = new JTextField("Search");
-        searchField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
-            BorderFactory.createEmptyBorder(8, 8, 8, 8)
-        ));
-        searchField.setPreferredSize(new Dimension(300, 36));
-        searchField.setFont(new Font("Inter", Font.PLAIN, 13));
-        searchField.setForeground(LaravelTheme.MUTED_TEXT);
-        
-        // Clear default text on focus
-        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (searchField.getText().equals("Search")) {
-                    searchField.setText("");
-                    searchField.setForeground(LaravelTheme.TEXT_DARK);
-                }
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search");
-                    searchField.setForeground(LaravelTheme.MUTED_TEXT);
-                }
-            }
-        });
-        
-        // Add padding to the search panel with consistent spacing
-        JPanel searchPadding = new JPanel();
-        searchPadding.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 12));
-        searchPadding.setBackground(Color.WHITE);
-        searchPadding.add(searchField);
-        searchPanel.add(searchPadding, BorderLayout.CENTER);
-        
         // Main content panel
         contentPanel = new JPanel();
         contentPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         
         // Add components to content area
-        contentAreaPanel.add(searchPanel, BorderLayout.NORTH);
         contentAreaPanel.add(contentPanel, BorderLayout.CENTER);
         
         // Add sidebar and content area to main panel
