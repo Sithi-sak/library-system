@@ -101,4 +101,108 @@ public class UserDAO {
         
         return false;
     }
+    
+    public java.util.List<User> getAllUsers() {
+        String sql = "SELECT * FROM users ORDER BY role DESC, join_date DESC";
+        java.util.List<User> users = new java.util.ArrayList<>();
+        
+        try (Connection conn = DBConnection.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setPasswordHash(rs.getString("password_hash"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setMemberStatus(rs.getString("member_status"));
+                user.setRole(rs.getString("role"));
+                user.setJoinDate(rs.getString("join_date"));
+                user.setLastLogin(rs.getString("last_login"));
+                
+                users.add(user);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return users;
+    }
+    
+    public int countUsersByRole(String role) {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = ?";
+        
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, role);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return 0;
+    }
+    
+    public int countNewMembersInLastDays(int days) {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'member' AND join_date >= DATE_SUB(CURRENT_DATE(), INTERVAL ? DAY)";
+        
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, days);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return 0;
+    }
+    
+    public java.util.List<User> getNonAdminUsers() {
+        String sql = "SELECT * FROM users WHERE role != 'admin' ORDER BY join_date DESC";
+        java.util.List<User> users = new java.util.ArrayList<>();
+        
+        try (Connection conn = DBConnection.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setPasswordHash(rs.getString("password_hash"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setMemberStatus(rs.getString("member_status"));
+                user.setRole(rs.getString("role"));
+                user.setJoinDate(rs.getString("join_date"));
+                user.setLastLogin(rs.getString("last_login"));
+                
+                users.add(user);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return users;
+    }
 } 
