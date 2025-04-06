@@ -205,4 +205,25 @@ public class UserDAO {
         
         return users;
     }
+    
+    public boolean updateUser(User user) {
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, password_hash = ? WHERE user_id = ?";
+        
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, user.getFullName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPhoneNumber());
+            stmt.setString(4, user.getPasswordHash());
+            stmt.setInt(5, user.getUserId());
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 } 
