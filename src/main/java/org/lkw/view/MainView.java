@@ -6,6 +6,7 @@ import org.lkw.model.User;
 import org.lkw.view.user.UserSettingsPanel;
 import org.lkw.view.user.UserDashboardPanel;
 import org.lkw.view.user.UserBooksPanel;
+import org.lkw.view.user.UserTransactionsPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -240,12 +241,7 @@ public class MainView extends JFrame {
     private void showTransactionsContent() {
         contentPanel.removeAll();
         contentPanel.setLayout(new BorderLayout());
-        
-        JLabel transactionsLabel = new JLabel("Transactions Content");
-        transactionsLabel.setFont(new Font("Inter", Font.BOLD, 24));
-        transactionsLabel.setForeground(LaravelTheme.TEXT_DARK);
-        
-        contentPanel.add(transactionsLabel, BorderLayout.CENTER);
+        contentPanel.add(new UserTransactionsPanel(currentUser), BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
