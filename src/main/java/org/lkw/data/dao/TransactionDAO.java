@@ -14,6 +14,16 @@ public class TransactionDAO {
     private final Connection connection;
     private final BookDAO bookDAO;
 
+    private static final String INSERT_TRANSACTION = 
+        "INSERT INTO transactions (user_id, book_id, borrow_date, due_date, status) VALUES (?, ?, ?, ?, ?)";
+    private static final String UPDATE_TRANSACTION = 
+        "UPDATE transactions SET return_date = ?, status = ? WHERE id = ?";
+    private static final String GET_USER_TRANSACTIONS = 
+        "SELECT t.*, b.title as book_title, b.* FROM transactions t " +
+        "JOIN books b ON t.book_id = b.book_id " +
+        "WHERE t.user_id = ? " +
+        "ORDER BY t.borrow_date DESC";
+
     public TransactionDAO() {
         this.connection = DBConnection.connect();
         this.bookDAO = new BookDAO();
@@ -253,5 +263,83 @@ public class TransactionDAO {
             e.printStackTrace();
         }
         return overdue;
+    }
+
+    public void addTransaction(int userId, int bookId) {
+        try (Connection conn = connection;
+             PreparedStatement stmt = conn.prepareStatement(INSERT_TRANSACTION)) {
+            
+            LocalDateTime borrowDate = LocalDateTime.now();
+            LocalDateTime dueDate = borrowDate.plusDays(14); // 2 weeks borrowing period
+            
+            stmt.setInt(1, userId);
+            stmt.setInt(2, bookId);
+            stmt.setTimestamp(3, Timestamp.valueOf(borrowDate));
+            stmt.setTimestamp(4, Timestamp.valueOf(dueDate));
+            stmt.setString(5, "borrowed");
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error adding transaction", e);
+        }
+    }
+
+    public void returnBook(int transactionId) {
+        try (Connection conn = connection;
+             PreparedStatement stmt = conn.prepareStatement(UPDATE_TRANSACTION)) {
+            
+            stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setString(2, "returned");
+            stmt.setInt(3, transactionId);
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error updating transaction", e);
+        }
+    }
+
+    public List<Transaction> getUserTransactions(String userId) {
+        List<Transaction> transactions = new ArrayList<>();
+        
+        try (Connection conn = connection;
+             PreparedStatement stmt = conn.prepareStatement(GET_USER_TRANSACTIONS)) {
+            
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Transaction transaction = new Transaction();
+                transaction.setId(rs.getInt("transaction_id"));
+                transaction.setUserId(rs.getInt("user_id"));
+                transaction.setBookId(rs.getInt("book_id"));
+                transaction.setBorrowDate(rs.getTimestamp("borrow_date").toLocalDateTime());
+                transaction.setDueDate(rs.getTimestamp("due_date").toLocalDateTime());
+                
+                Timestamp returnDate = rs.getTimestamp("return_date");
+                if (returnDate != null) {
+                    transaction.setReturnDate(returnDate.toLocalDateTime());
+                }
+                
+                transaction.setStatus(rs.getString("status"));
+                
+                // Set book information
+                Book book = new Book();
+                book.setBookId(rs.getInt("book_id"));
+                book.setTitle(rs.getString("title"));
+                transaction.setBook(book);
+                
+                transactions.add(transaction);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error fetching user transactions", e);
+        }
+        
+        return transactions;
     }
 } 
