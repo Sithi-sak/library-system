@@ -11,14 +11,15 @@ import java.awt.event.MouseEvent;
  */
 public class LaravelTheme {
     // Laravel theme colors
-    public static final Color PRIMARY_RED = new Color(249, 50, 50);
+    public static final Color PRIMARY_RED = new Color(220, 38, 38);
+    public static final Color DANGER_RED = new Color(239, 68, 68);
     public static final Color DARK_RED = new Color(227, 36, 43);
-    public static final Color LIGHT_GRAY = new Color(247, 247, 247);
-    public static final Color BORDER_GRAY = new Color(221, 221, 221);
-    public static final Color TEXT_DARK = new Color(55, 65, 81);
-    public static final Color MUTED_TEXT = new Color(119, 119, 119);
+    public static final Color LIGHT_GRAY = new Color(249, 250, 251);
+    public static final Color BORDER_GRAY = new Color(229, 231, 235);
+    public static final Color TEXT_DARK = new Color(17, 24, 39);
+    public static final Color MUTED_TEXT = new Color(107, 114, 128);
     public static final Color LABEL_COLOR = new Color(77, 77, 77);
-    public static final Color BACKGROUND_COLOR = new Color(248, 249, 250);
+    public static final Color BACKGROUND_COLOR = new Color(248, 250, 252);
     
     // Consistent dimensions and padding
     private static final int FIELD_HEIGHT = 38;
