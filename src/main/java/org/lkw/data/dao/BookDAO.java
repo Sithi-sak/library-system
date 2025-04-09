@@ -128,10 +128,9 @@ public class BookDAO {
     }
     
     // Update an existing book
-    public boolean updateBook(Book book) {
-        String sql = "UPDATE books SET title = ?, author = ?, isbn = ?, publisher_id = ?, " +
-                    "publication_year = ?, category_id = ?, genre_id = ?, copies_available = ?, " +
-                    "total_copies = ?, cover_image = ? WHERE book_id = ?";
+    public void updateBook(Book book) {
+        String sql = "UPDATE books SET title = ?, author = ?, isbn = ?, publisher = ?, publication_year = ?, " +
+                    "copies_available = ?, category_id = ?, genre_id = ? WHERE book_id = ?";
         
         try (Connection conn = DBConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -139,20 +138,17 @@ public class BookDAO {
             stmt.setString(1, book.getTitle());
             stmt.setString(2, book.getAuthor());
             stmt.setString(3, book.getIsbn());
-            stmt.setInt(4, book.getPublisherId());
+            stmt.setString(4, book.getPublisher());
             stmt.setInt(5, book.getPublicationYear());
-            stmt.setInt(6, book.getCategoryId());
-            stmt.setInt(7, book.getGenreId());
-            stmt.setInt(8, book.getCopiesAvailable());
-            stmt.setInt(9, book.getTotalCopies());
-            stmt.setBytes(10, book.getCoverImage());
-            stmt.setInt(11, book.getBookId());
+            stmt.setInt(6, book.getCopiesAvailable());
+            stmt.setInt(7, book.getCategoryId());
+            stmt.setInt(8, book.getGenreId());
+            stmt.setInt(9, book.getBookId());
             
-            return stmt.executeUpdate() > 0;
-            
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("Failed to update book", e);
         }
     }
     
