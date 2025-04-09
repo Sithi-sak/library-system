@@ -600,7 +600,12 @@ public class BooksPanel extends JPanel {
                 int newTotal = Math.max(existingBook.getTotalCopies(), copies);
                 book.setTotalCopies(newTotal);
             }
-            success = bookDAO.updateBook(book);
+            try {
+                bookDAO.updateBook(book);
+                success = true;
+            } catch (RuntimeException e) {
+                success = false;
+            }
         }
 
         if (success) {
