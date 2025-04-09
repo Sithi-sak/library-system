@@ -27,6 +27,7 @@ public class UsersPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTextField searchField;
     private JComboBox<String> filterComboBox;
+    private JList<String> activityList;
     
     // User action buttons
     private JButton toggleStatusButton;
@@ -145,6 +146,21 @@ public class UsersPanel extends JPanel {
                     "Password reset functionality would send a reset email or generate a new password", 
                     "Reset Password", 
                     JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        // Add table selection listener
+        usersTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = usersTable.getSelectedRow();
+                if (selectedRow >= 0) {
+                    String username = (String) usersTable.getValueAt(selectedRow, 0);
+                    selectedUser = userDAO.getUserByUsername(username);
+                    updateUserDetails(selectedUser);
+                } else {
+                    selectedUser = null;
+                    updateUserDetails(null);
+                }
             }
         });
     }
@@ -352,7 +368,7 @@ public class UsersPanel extends JPanel {
         DefaultListModel<String> activityModel = new DefaultListModel<>();
         activityModel.addElement("No activity data available");
         
-        JList<String> activityList = new JList<>(activityModel);
+        activityList = new JList<>(activityModel);
         activityList.setFont(new Font("Inter", Font.PLAIN, 13));
         activityList.setFixedCellHeight(30);
         
@@ -484,11 +500,11 @@ public class UsersPanel extends JPanel {
                 // Update button text based on status
                 toggleStatusButton.setText(status.equalsIgnoreCase("Active") ? "Deactivate User" : "Activate User");
                 
-                // Update user statistics (these would be fetched from the database in a real implementation)
-                totalBorrowedLabel.setText("15");
-                currentlyBorrowedLabel.setText("3");
-                overdueLabel.setText("1");
-                totalTransactionsLabel.setText("25");
+                // Set all statistics to 0 since borrowing is not implemented yet
+                totalBorrowedLabel.setText("0");
+                currentlyBorrowedLabel.setText("0");
+                overdueLabel.setText("0");
+                totalTransactionsLabel.setText("0");
                 
                 break;
             }
@@ -621,5 +637,63 @@ public class UsersPanel extends JPanel {
     // Method to refresh data (would be called when data changes)
     public void refreshData() {
         loadUserData();
+    }
+
+    private void updateUserDetails(User user) {
+        if (user != null) {
+            // Update basic user information
+            userNameValueLabel.setText(user.getUsername() + " (" + user.getFullName() + ")");
+            userEmailValueLabel.setText(user.getEmail());
+            userRoleValueLabel.setText(user.getRole());
+            userStatusValueLabel.setText(user.getMemberStatus());
+            userRegisteredValueLabel.setText(formatDate(user.getJoinDate()));
+            userLastLoginValueLabel.setText(user.getLastLogin() != null ? formatDate(user.getLastLogin()) : "Never");
+
+            // Set all statistics to 0 since borrowing is not implemented yet
+            totalBorrowedLabel.setText("0");
+            currentlyBorrowedLabel.setText("0");
+            overdueLabel.setText("0");
+            totalTransactionsLabel.setText("0");
+
+            // Update button states
+            boolean isActive = "active".equalsIgnoreCase(user.getMemberStatus());
+            toggleStatusButton.setText(isActive ? "Deactivate Account" : "Activate Account");
+            toggleStatusButton.setEnabled(true);
+            resetPasswordButton.setEnabled(true);
+
+            // Clear activity data
+            DefaultListModel<String> model = (DefaultListModel<String>) activityList.getModel();
+            model.clear();
+            model.addElement("No activity data available");
+        } else {
+            // Clear all fields if no user is selected
+            userNameValueLabel.setText("");
+            userEmailValueLabel.setText("");
+            userRoleValueLabel.setText("");
+            userStatusValueLabel.setText("");
+            userRegisteredValueLabel.setText("");
+            userLastLoginValueLabel.setText("");
+            
+            totalBorrowedLabel.setText("0");
+            currentlyBorrowedLabel.setText("0");
+            overdueLabel.setText("0");
+            totalTransactionsLabel.setText("0");
+
+            // Disable buttons
+            toggleStatusButton.setEnabled(false);
+            resetPasswordButton.setEnabled(false);
+
+            // Clear activity data
+            DefaultListModel<String> model = (DefaultListModel<String>) activityList.getModel();
+            model.clear();
+        }
+    }
+
+    private void updateStatistics(User user) {
+        // Set all statistics to 0 since borrowing is not implemented yet
+        totalBorrowedLabel.setText("0");
+        currentlyBorrowedLabel.setText("0");
+        overdueLabel.setText("0");
+        totalTransactionsLabel.setText("0");
     }
 } 
