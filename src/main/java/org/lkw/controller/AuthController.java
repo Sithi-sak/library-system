@@ -75,7 +75,7 @@ public class AuthController {
                     // Open member view for regular users
                     mainView = new MainView();
                     mainView.setUser(user);
-                    mainView.setLogoutActionListener(e1 -> logout());
+                    mainView.setLogoutListener(e1 -> logout());
                     
                     // Apply maximized state if needed
                     if (wasMaximized) {
