@@ -430,4 +430,54 @@ public class DashboardPanel extends JPanel {
             }
         }
     }
+
+    public void refreshData() {
+        // Refresh all dashboard statistics and data
+        updateTotalMembers();
+        updateTotalBooks();
+        updateBorrowedBooks();
+        updateOverdueBooks();
+        updateAvailableBooks();
+        updateNewBooks();
+        updateRecentActivity();
+        updateAlerts();
+    }
+
+    private void updateTotalMembers() {
+        // TODO: Implement total members update
+        totalMembersValueLabel.setText("0");
+    }
+
+    private void updateTotalBooks() {
+        // TODO: Implement total books update
+        totalBooksValueLabel.setText("0");
+    }
+
+    private void updateBorrowedBooks() {
+        // TODO: Implement borrowed books update
+        borrowedBooksValueLabel.setText("0");
+    }
+
+    private void updateOverdueBooks() {
+        // TODO: Implement overdue books update
+        overdueBooksValueLabel.setText("0");
+    }
+
+    private void updateAvailableBooks() {
+        // TODO: Implement available books update
+        availableBooksValueLabel.setText("0");
+    }
+
+    private void updateNewBooks() {
+        // TODO: Implement new books update
+        newBooksValueLabel.setText("0");
+    }
+
+    private void updateRecentActivity() {
+        // TODO: Implement recent activity update
+    }
+
+    private void updateAlerts() {
+        // TODO: Implement alerts update
+    }
 } 
