@@ -7,7 +7,6 @@ import org.lkw.view.admin.DashboardPanel;
 import org.lkw.view.admin.UsersPanel;
 import org.lkw.view.admin.BooksPanel;
 import org.lkw.view.admin.SettingsPanel;
-import org.lkw.view.admin.TransactionsPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,7 +22,6 @@ public class AdminView extends JFrame {
     private final JButton dashboardButton;
     private final JButton usersButton;
     private final JButton booksButton;
-    private final JButton transactionsButton;
     private final JButton settingButton;
     private final JButton logoutButton;
     
@@ -39,7 +37,6 @@ public class AdminView extends JFrame {
     private UsersPanel usersPanel;
     private BooksPanel booksPanel;
     private SettingsPanel settingsPanel;
-    private TransactionsPanel transactionsPanel;
     
     // User info
     private User currentUser;
@@ -92,45 +89,35 @@ public class AdminView extends JFrame {
         
         profilePanel.add(userInfoPanel, BorderLayout.CENTER);
         
-        // Menu items panel
+        // Create menu panel
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         menuPanel.setBackground(Color.WHITE);
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         
         // Create menu buttons
         dashboardButton = createMenuButton("Dashboard", true);
         usersButton = createMenuButton("Users", false);
         booksButton = createMenuButton("Books", false);
-        transactionsButton = createMenuButton("Transactions", false);
-        settingButton = createMenuButton("Setting", false);
+        settingButton = createMenuButton("Settings", false);
+        logoutButton = createMenuButton("Logout", false);
         
-        // Set Dashboard as the active button initially
+        // Set initial active button
         activeButton = dashboardButton;
         
-        // Add buttons to the menu panel
+        // Add buttons to menu panel
         menuPanel.add(dashboardButton);
+        menuPanel.add(Box.createVerticalStrut(5));
         menuPanel.add(usersButton);
+        menuPanel.add(Box.createVerticalStrut(5));
         menuPanel.add(booksButton);
-        menuPanel.add(transactionsButton);
+        menuPanel.add(Box.createVerticalStrut(5));
         menuPanel.add(settingButton);
         
-        // Add filler to push logout button to the bottom
-        menuPanel.add(Box.createVerticalGlue());
-        
-        // Logout button at the bottom of the sidebar
-        logoutButton = new JButton("Logout");
-        logoutButton.setFont(new Font("Inter", Font.BOLD, 14));
-        logoutButton.setForeground(LaravelTheme.TEXT_DARK);
+        // Style logout button
         logoutButton.setBackground(Color.WHITE);
-        logoutButton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 0, 0, LaravelTheme.BORDER_GRAY),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
-        ));
-        logoutButton.setFocusPainted(false);
-        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        logoutButton.setHorizontalAlignment(SwingConstants.CENTER);
-        logoutButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, logoutButton.getPreferredSize().height));
+        logoutButton.setForeground(LaravelTheme.DANGER_RED);
+        logoutButton.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Add the panels to the sidebar
@@ -174,20 +161,13 @@ public class AdminView extends JFrame {
     private JButton createMenuButton(String text, boolean isActive) {
         JButton button = new JButton(text);
         button.setFont(new Font("Inter", Font.BOLD, 14));
-        button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setBorderPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Set initial styling
-        updateButtonStyle(button, isActive);
-        
-        // Add padding
-        button.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
-        
-        // Make sure the button spans the full width of the sidebar
+        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
-        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        updateButtonStyle(button, isActive);
         
         return button;
     }
@@ -205,7 +185,6 @@ public class AdminView extends JFrame {
     }
     
     private void setupButtonActions() {
-        // Dashboard button
         dashboardButton.addActionListener(e -> {
             if (activeButton != dashboardButton) {
                 updateButtonStyle(activeButton, false);
@@ -215,12 +194,15 @@ public class AdminView extends JFrame {
                 // Clear the content panel
                 contentPanel.removeAll();
                 
-                // Add the dashboard panel back if needed
+                // Add the dashboard panel back
                 contentPanel.add(dashboardPanel, "dashboard");
                 
-                // Show the dashboard
+                // Show the dashboard panel
                 CardLayout cl = (CardLayout) contentPanel.getLayout();
                 cl.show(contentPanel, "dashboard");
+                
+                // Update dashboard data
+                dashboardPanel.updateDashboardData();
                 
                 // Revalidate and repaint
                 contentPanel.revalidate();
@@ -228,7 +210,6 @@ public class AdminView extends JFrame {
             }
         });
         
-        // Users button
         usersButton.addActionListener(e -> {
             if (activeButton != usersButton) {
                 updateButtonStyle(activeButton, false);
@@ -256,7 +237,6 @@ public class AdminView extends JFrame {
             }
         });
         
-        // Books button
         booksButton.addActionListener(e -> {
             if (activeButton != booksButton) {
                 updateButtonStyle(activeButton, false);
@@ -284,35 +264,6 @@ public class AdminView extends JFrame {
             }
         });
         
-        // Transactions button
-        transactionsButton.addActionListener(e -> {
-            if (activeButton != transactionsButton) {
-                updateButtonStyle(activeButton, false);
-                updateButtonStyle(transactionsButton, true);
-                activeButton = transactionsButton;
-                
-                // Clear the content panel
-                contentPanel.removeAll();
-                
-                // Create the transactions panel if it doesn't exist
-                if (transactionsPanel == null) {
-                    transactionsPanel = new TransactionsPanel();
-                }
-                
-                // Add the transactions panel
-                contentPanel.add(transactionsPanel, "transactions");
-                
-                // Show the transactions panel
-                CardLayout cl = (CardLayout) contentPanel.getLayout();
-                cl.show(contentPanel, "transactions");
-                
-                // Revalidate and repaint
-                contentPanel.revalidate();
-                contentPanel.repaint();
-            }
-        });
-        
-        // Settings button
         settingButton.addActionListener(e -> {
             if (activeButton != settingButton) {
                 updateButtonStyle(activeButton, false);
@@ -341,45 +292,6 @@ public class AdminView extends JFrame {
         });
     }
     
-    // Temporary method to show placeholders for sections not yet implemented
-    private void showPlaceholder(String title) {
-        // Clear the content panel
-        contentPanel.removeAll();
-        
-        // Create a placeholder panel
-        JPanel placeholderPanel = new JPanel(new BorderLayout());
-        placeholderPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
-        placeholderPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
-        
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Inter", Font.BOLD, 24));
-        titleLabel.setForeground(LaravelTheme.TEXT_DARK);
-        
-        JLabel comingSoonLabel = new JLabel("Coming soon...");
-        comingSoonLabel.setFont(new Font("Inter", Font.PLAIN, 16));
-        comingSoonLabel.setForeground(LaravelTheme.MUTED_TEXT);
-        comingSoonLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
-        centerPanel.add(comingSoonLabel);
-        
-        placeholderPanel.add(titleLabel, BorderLayout.NORTH);
-        placeholderPanel.add(centerPanel, BorderLayout.CENTER);
-        
-        // Add the placeholder panel to content panel
-        contentPanel.add(placeholderPanel, "placeholder");
-        
-        // Show the placeholder
-        CardLayout cl = (CardLayout) contentPanel.getLayout();
-        cl.show(contentPanel, "placeholder");
-        
-        // Revalidate and repaint
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-    
-    // Set user info
     public void setUser(User user) {
         this.currentUser = user;
         usernameLabel.setText(user.getUsername());
@@ -388,24 +300,29 @@ public class AdminView extends JFrame {
         String role = user.getRole();
         role = role.substring(0, 1).toUpperCase() + role.substring(1);
         roleLabel.setText("Role: " + role);
+        
+        // Show the dashboard after user is set
+        showDashboardContent();
     }
     
-    // Add action listeners
     public void setLogoutActionListener(ActionListener listener) {
         logoutButton.addActionListener(listener);
     }
     
-    // Window state methods
     public void maximizeIfNeeded(boolean shouldMaximize) {
         if (shouldMaximize) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
     }
     
-    // Add this method to refresh the dashboard
+    private void showDashboardContent() {
+        CardLayout cl = (CardLayout) contentPanel.getLayout();
+        cl.show(contentPanel, "dashboard");
+    }
+    
     public void refreshDashboard() {
         if (dashboardPanel != null) {
-            dashboardPanel.updateDashboardData();
+            dashboardPanel.refreshData();
         }
     }
 } 
