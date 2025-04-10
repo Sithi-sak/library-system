@@ -15,16 +15,6 @@ public class SettingsPanel extends JPanel {
     private final JTextField contactNumberField;
     private final JTextField emailField;
     
-    // Borrowing Settings Fields
-    private final JSpinner maxBooksPerUserSpinner;
-    private final JSpinner loanPeriodSpinner;
-    private final JSpinner reservationPeriodSpinner;
-    
-    // Fine Settings Fields
-    private final JSpinner lateFeePerDaySpinner;
-    private final JSpinner maxFineSpinner;
-    private final JSpinner gracePeriodSpinner;
-    
     // System Settings Fields
     private final JCheckBox enableEmailNotificationsCheckbox;
     private final JCheckBox enableAutoRenewalCheckbox;
@@ -39,14 +29,6 @@ public class SettingsPanel extends JPanel {
         addressField = new JTextField(20);
         contactNumberField = new JTextField(20);
         emailField = new JTextField(20);
-        
-        maxBooksPerUserSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 50, 1));
-        loanPeriodSpinner = new JSpinner(new SpinnerNumberModel(14, 1, 90, 1));
-        reservationPeriodSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 30, 1));
-        
-        lateFeePerDaySpinner = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1));
-        maxFineSpinner = new JSpinner(new SpinnerNumberModel(50.0, 0.0, 1000.0, 5.0));
-        gracePeriodSpinner = new JSpinner(new SpinnerNumberModel(2, 0, 14, 1));
         
         enableEmailNotificationsCheckbox = new JCheckBox("Enable Email Notifications");
         enableAutoRenewalCheckbox = new JCheckBox("Enable Auto-Renewal");
@@ -74,8 +56,6 @@ public class SettingsPanel extends JPanel {
         // Add sections with left alignment
         JPanel[] sections = {
             createLibraryInfoSection(),
-            createBorrowingSettingsSection(),
-            createFineSettingsSection(),
             createSystemSettingsSection()
         };
         
@@ -123,8 +103,6 @@ public class SettingsPanel extends JPanel {
     
     private void styleSpinners() {
         JSpinner[] spinners = {
-            maxBooksPerUserSpinner, loanPeriodSpinner, reservationPeriodSpinner,
-            lateFeePerDaySpinner, maxFineSpinner, gracePeriodSpinner,
             backupFrequencySpinner
         };
         
@@ -145,7 +123,7 @@ public class SettingsPanel extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL; // Make components fill horizontal space
-        
+
         // Section title
         JLabel titleLabel = new JLabel("Library Information");
         titleLabel.setForeground(LaravelTheme.PRIMARY_RED);
@@ -163,62 +141,6 @@ public class SettingsPanel extends JPanel {
         addFormField(panel, "Address:", addressField, gbc, 2);
         addFormField(panel, "Contact Number:", contactNumberField, gbc, 3);
         addFormField(panel, "Email:", emailField, gbc, 4);
-        
-        return panel;
-    }
-    
-    private JPanel createBorrowingSettingsSection() {
-        JPanel panel = LaravelTheme.createCard();
-        panel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Make components fill horizontal space
-        
-        // Section title
-        JLabel titleLabel = new JLabel("Borrowing Settings");
-        titleLabel.setForeground(LaravelTheme.PRIMARY_RED);
-        titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panel.add(titleLabel, gbc);
-        
-        // Reset gridwidth
-        gbc.gridwidth = 1;
-        
-        // Add fields
-        addFormField(panel, "Maximum Books per User:", maxBooksPerUserSpinner, gbc, 1);
-        addFormField(panel, "Loan Period (days):", loanPeriodSpinner, gbc, 2);
-        addFormField(panel, "Reservation Period (days):", reservationPeriodSpinner, gbc, 3);
-        
-        return panel;
-    }
-    
-    private JPanel createFineSettingsSection() {
-        JPanel panel = LaravelTheme.createCard();
-        panel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Make components fill horizontal space
-        
-        // Section title
-        JLabel titleLabel = new JLabel("Fine Settings");
-        titleLabel.setForeground(LaravelTheme.PRIMARY_RED);
-        titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panel.add(titleLabel, gbc);
-        
-        // Reset gridwidth
-        gbc.gridwidth = 1;
-        
-        // Add fields
-        addFormField(panel, "Late Fee per Day ($):", lateFeePerDaySpinner, gbc, 1);
-        addFormField(panel, "Maximum Fine ($):", maxFineSpinner, gbc, 2);
-        addFormField(panel, "Grace Period (days):", gracePeriodSpinner, gbc, 3);
         
         return panel;
     }
@@ -288,16 +210,6 @@ public class SettingsPanel extends JPanel {
         contactNumberField.setText(prefs.get("contactNumber", ""));
         emailField.setText(prefs.get("email", ""));
         
-        // Load Borrowing Settings
-        maxBooksPerUserSpinner.setValue(prefs.getInt("maxBooksPerUser", 5));
-        loanPeriodSpinner.setValue(prefs.getInt("loanPeriod", 14));
-        reservationPeriodSpinner.setValue(prefs.getInt("reservationPeriod", 3));
-        
-        // Load Fine Settings
-        lateFeePerDaySpinner.setValue(prefs.getDouble("lateFeePerDay", 1.0));
-        maxFineSpinner.setValue(prefs.getDouble("maxFine", 50.0));
-        gracePeriodSpinner.setValue(prefs.getInt("gracePeriod", 2));
-        
         // Load System Settings
         enableEmailNotificationsCheckbox.setSelected(prefs.getBoolean("enableEmailNotifications", true));
         enableAutoRenewalCheckbox.setSelected(prefs.getBoolean("enableAutoRenewal", false));
@@ -311,16 +223,6 @@ public class SettingsPanel extends JPanel {
         prefs.put("address", addressField.getText());
         prefs.put("contactNumber", contactNumberField.getText());
         prefs.put("email", emailField.getText());
-        
-        // Save Borrowing Settings
-        prefs.putInt("maxBooksPerUser", (Integer) maxBooksPerUserSpinner.getValue());
-        prefs.putInt("loanPeriod", (Integer) loanPeriodSpinner.getValue());
-        prefs.putInt("reservationPeriod", (Integer) reservationPeriodSpinner.getValue());
-        
-        // Save Fine Settings
-        prefs.putDouble("lateFeePerDay", (Double) lateFeePerDaySpinner.getValue());
-        prefs.putDouble("maxFine", (Double) maxFineSpinner.getValue());
-        prefs.putInt("gracePeriod", (Integer) gracePeriodSpinner.getValue());
         
         // Save System Settings
         prefs.putBoolean("enableEmailNotifications", enableEmailNotificationsCheckbox.isSelected());
