@@ -258,96 +258,151 @@ public class UserBooksPanel extends JPanel {
             return;
         }
 
-        // Create a text pane for the title with proper wrapping
+        detailsPanel.removeAll();
+        
+        // Create a wrapper panel to center the content vertically
+        JPanel contentWrapper = new JPanel();
+        contentWrapper.setLayout(new BoxLayout(contentWrapper, BoxLayout.Y_AXIS));
+        contentWrapper.setBackground(Color.WHITE);
+        contentWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentWrapper.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, Integer.MAX_VALUE));
+
+        // Create header panel with close button
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBorder(new EmptyBorder(4, 8, 4, 8));
+        headerPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, 32));
+        
+        JButton closeButton = new JButton("×");
+        closeButton.setFont(new Font("Inter", Font.PLAIN, 18));
+        closeButton.setForeground(LaravelTheme.MUTED_TEXT);
+        closeButton.setBorder(null);
+        closeButton.setContentAreaFilled(false);
+        closeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        closeButton.addActionListener(e -> detailsPanel.setVisible(false));
+        headerPanel.add(closeButton, BorderLayout.EAST);
+        
+        contentWrapper.add(headerPanel);
+
+        // Create a panel for the book cover
+        JPanel coverPanel = new JPanel();
+        coverPanel.setBackground(Color.WHITE);
+        coverPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY),
+            new EmptyBorder(4, 4, 4, 4)
+        ));
+        coverPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        coverPanel.setMaximumSize(new Dimension(220, 300));
+
+        // Add book cover image
+        if (book.getCoverImage() != null) {
+            ImageIcon coverIcon = new ImageIcon(book.getCoverImage());
+            Image scaledImage = coverIcon.getImage().getScaledInstance(200, 280, Image.SCALE_SMOOTH);
+            JLabel coverLabel = new JLabel(new ImageIcon(scaledImage));
+            coverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            coverPanel.add(coverLabel);
+        }
+
+        // Add cover panel with minimal padding
+        JPanel coverWrapper = new JPanel();
+        coverWrapper.setLayout(new BoxLayout(coverWrapper, BoxLayout.Y_AXIS));
+        coverWrapper.setBackground(Color.WHITE);
+        coverWrapper.setBorder(new EmptyBorder(8, 0, 8, 0));
+        coverWrapper.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, 316));  // Cover height + padding
+        coverWrapper.add(coverPanel);
+        contentWrapper.add(coverWrapper);
+
+        // Title and author panel
+        JPanel titleAuthorPanel = new JPanel();
+        titleAuthorPanel.setLayout(new BoxLayout(titleAuthorPanel, BoxLayout.Y_AXIS));
+        titleAuthorPanel.setBackground(Color.WHITE);
+        titleAuthorPanel.setBorder(new EmptyBorder(0, 4, 4, 4));
+        titleAuthorPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleAuthorPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 8, 60));  // Fixed height for title area
+
+        // Title
         JTextPane titlePane = new JTextPane();
         titlePane.setText(book.getTitle());
-        titlePane.setFont(new Font("Inter", Font.BOLD, 16));
+        titlePane.setFont(new Font("Inter", Font.BOLD, 14));
         titlePane.setEditable(false);
         titlePane.setBackground(Color.WHITE);
-        titlePane.setBorder(null);
+        titlePane.setBorder(new EmptyBorder(0, 0, 0, 0));
+        titlePane.setMargin(new Insets(0, 0, 0, 0));
         
-        // Center align the text
         StyledDocument doc = titlePane.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         doc.setParagraphAttributes(0, doc.getLength(), center, false);
-        
-        // Set size constraints
-        int titleWidth = 220;
-        titlePane.setSize(titleWidth, Short.MAX_VALUE);
-        int preferredHeight = titlePane.getPreferredSize().height;
-        titlePane.setPreferredSize(new Dimension(titleWidth, preferredHeight));
-        titlePane.setMaximumSize(new Dimension(titleWidth, preferredHeight));
+        titlePane.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 16, 40));
+        titleAuthorPanel.add(titlePane);
 
-        // Create labels for book details
-        JLabel authorLabel = new JLabel("by " + book.getAuthor());
-        authorLabel.setFont(new Font("Inter", Font.PLAIN, 13));
+        // Author
+        JLabel authorLabel = new JLabel("by " + book.getAuthor(), SwingConstants.CENTER);
+        authorLabel.setFont(new Font("Inter", Font.PLAIN, 12));
         authorLabel.setForeground(LaravelTheme.MUTED_TEXT);
         authorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        authorLabel.setBorder(new EmptyBorder(2, 0, 0, 0));
+        titleAuthorPanel.add(authorLabel);
 
-        // Add book info rows
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.setBackground(new Color(250, 250, 250));
-        infoPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(240, 240, 240)),
-            new EmptyBorder(12, 12, 12, 12)
-        ));
+        contentWrapper.add(titleAuthorPanel);
+
+        // Book info panel
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBorder(new EmptyBorder(4, 12, 8, 12));
         infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        infoPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, Integer.MAX_VALUE));
+        infoPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, 120));  // Fixed height for info area
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 0, 2, 8);
 
-        addInfoRow(infoPanel, "ISBN", book.getIsbn());
-        addInfoRow(infoPanel, "Category", book.getCategory());
-        addInfoRow(infoPanel, "Genre", book.getGenre());
-        addInfoRow(infoPanel, "Publication Year", String.valueOf(book.getPublicationYear()));
-        addInfoRow(infoPanel, "Available Copies", String.valueOf(book.getCopiesAvailable()));
+        addInfoRow(infoPanel, "ISBN:", book.getIsbn(), gbc);
+        addInfoRow(infoPanel, "Category:", book.getCategory(), gbc);
+        addInfoRow(infoPanel, "Genre:", book.getGenre(), gbc);
+        addInfoRow(infoPanel, "Publication Year:", String.valueOf(book.getPublicationYear()), gbc);
+        addInfoRow(infoPanel, "Available Copies:", String.valueOf(book.getCopiesAvailable()), gbc);
 
-        // Create borrow button
-        JButton borrowButton = new JButton(book.getCopiesAvailable() > 0 ? "Borrow Book" : "Not Available");
-        borrowButton.setFont(new Font("Inter", Font.BOLD, 13));
-        borrowButton.setBackground(LaravelTheme.PRIMARY_RED);
-        borrowButton.setForeground(Color.WHITE);
-        borrowButton.setBorder(new EmptyBorder(10, 0, 10, 0));
-        borrowButton.setFocusPainted(false);
-        borrowButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentWrapper.add(infoPanel);
+
+        // Borrow button panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 8, 0));
+        buttonPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, 40));  // Fixed height for button area
+        
+        JButton borrowButton = new JButton("Borrow Book");
+        LaravelTheme.stylePrimaryButton(borrowButton);
         borrowButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        borrowButton.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, 40));
-        borrowButton.setEnabled(book.getCopiesAvailable() > 0);
-        borrowButton.addActionListener(e -> borrowBook(book));
+        borrowButton.setEnabled(book.isAvailable());
+        if (!book.isAvailable()) {
+            borrowButton.setText("Not Available");
+        }
+        buttonPanel.add(borrowButton);
+        contentWrapper.add(buttonPanel);
 
-        // Update the details panel
-        detailsPanel.removeAll();
-        detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
-        detailsPanel.add(titlePane);
-        detailsPanel.add(Box.createVerticalStrut(4));
-        detailsPanel.add(authorLabel);
-        detailsPanel.add(Box.createVerticalStrut(16));
-        detailsPanel.add(infoPanel);
-        detailsPanel.add(Box.createVerticalStrut(12));
-        detailsPanel.add(borrowButton);
+        // Add glue at top and bottom to center the content vertically
+        detailsPanel.add(Box.createVerticalGlue());
+        detailsPanel.add(contentWrapper);
+        detailsPanel.add(Box.createVerticalGlue());
 
-        detailsPanel.setVisible(true);
         detailsPanel.revalidate();
         detailsPanel.repaint();
     }
 
-    private void addInfoRow(JPanel panel, String label, String value) {
-        JPanel rowPanel = new JPanel(new BorderLayout(8, 0));
-        rowPanel.setBackground(new Color(250, 250, 250));
-        rowPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH - 24, 24));
-        rowPanel.setBorder(new EmptyBorder(0, 0, 6, 0));
-
+    private void addInfoRow(JPanel panel, String label, String value, GridBagConstraints gbc) {
         JLabel labelComponent = new JLabel(label);
-        labelComponent.setFont(new Font("Inter", Font.PLAIN, 13));
-        labelComponent.setForeground(new Color(75, 85, 99));
+        labelComponent.setFont(new Font("Inter", Font.BOLD, 12));
+        panel.add(labelComponent, gbc);
 
+        gbc.gridx = 1;
         JLabel valueComponent = new JLabel(value);
-        valueComponent.setFont(new Font("Inter", Font.PLAIN, 13));
-        valueComponent.setForeground(LaravelTheme.TEXT_DARK);
+        valueComponent.setFont(new Font("Inter", Font.PLAIN, 12));
+        panel.add(valueComponent, gbc);
 
-        rowPanel.add(labelComponent, BorderLayout.WEST);
-        rowPanel.add(valueComponent, BorderLayout.EAST);
-        panel.add(rowPanel);
+        gbc.gridx = 0;
+        gbc.gridy++;
     }
 
     private JPanel createDetailsPanel() {
@@ -356,6 +411,7 @@ public class UserBooksPanel extends JPanel {
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
         panel.setPreferredSize(new Dimension(DETAILS_PANEL_WIDTH, 0));
+        panel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, Integer.MAX_VALUE));
         return panel;
     }
 

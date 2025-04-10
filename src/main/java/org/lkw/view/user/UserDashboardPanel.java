@@ -18,29 +18,162 @@ public class UserDashboardPanel extends JPanel {
         setBackground(LaravelTheme.BACKGROUND_COLOR);
         setBorder(new EmptyBorder(CONTAINER_PADDING, CONTAINER_PADDING, CONTAINER_PADDING, CONTAINER_PADDING));
 
-        // Create main content panel
-        JPanel contentPanel = new JPanel(new BorderLayout(0, 20));
+        // Create main content panel with vertical layout
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
 
         // Add welcome section
-        contentPanel.add(createWelcomePanel(), BorderLayout.NORTH);
+        contentPanel.add(createWelcomePanel());
+        contentPanel.add(Box.createVerticalStrut(20));
 
-        add(contentPanel, BorderLayout.CENTER);
+        // Add statistics section
+        contentPanel.add(createStatisticsPanel());
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        // Add quick actions section
+        contentPanel.add(createQuickActionsPanel());
+
+        // Wrap content panel in another panel to prevent stretching
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
+        wrapperPanel.add(contentPanel, BorderLayout.NORTH);
+
+        add(wrapperPanel, BorderLayout.CENTER);
     }
 
     private JPanel createWelcomePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230)),
-            new EmptyBorder(20, 24, 20, 24)
+            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
+            new EmptyBorder(24, 24, 24, 24)
         ));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
+        // Welcome message
         JLabel welcomeLabel = new JLabel("Welcome back, " + currentUser.getUsername() + "!");
         welcomeLabel.setFont(new Font("Inter", Font.BOLD, 24));
         welcomeLabel.setForeground(LaravelTheme.TEXT_DARK);
 
-        panel.add(welcomeLabel, BorderLayout.CENTER);
+        // Subtitle
+        JLabel subtitleLabel = new JLabel("Here's an overview of your library activity");
+        subtitleLabel.setFont(new Font("Inter", Font.PLAIN, 14));
+        subtitleLabel.setForeground(LaravelTheme.MUTED_TEXT);
+        subtitleLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setBackground(Color.WHITE);
+        textPanel.add(welcomeLabel);
+        textPanel.add(subtitleLabel);
+
+        panel.add(textPanel, BorderLayout.CENTER);
         return panel;
+    }
+
+    private JPanel createStatisticsPanel() {
+        JPanel panel = new JPanel(new GridLayout(1, 2, 16, 0));
+        panel.setBackground(LaravelTheme.BACKGROUND_COLOR);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+        // Add stat cards (removed fines since transactions are removed)
+        panel.add(createStatCard("Currently Borrowed", "0", "Books you have checked out"));
+        panel.add(createStatCard("Overdue", "0", "Books past their due date"));
+
+        return panel;
+    }
+
+    private JPanel createStatCard(String title, String value, String description) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
+            new EmptyBorder(16, 16, 16, 16)
+        ));
+
+        // Title
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Inter", Font.BOLD, 14));
+        titleLabel.setForeground(LaravelTheme.TEXT_DARK);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Value
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("Inter", Font.BOLD, 24));
+        valueLabel.setForeground(LaravelTheme.PRIMARY_RED);
+        valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        valueLabel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+
+        // Description
+        JLabel descLabel = new JLabel(description);
+        descLabel.setFont(new Font("Inter", Font.PLAIN, 13));
+        descLabel.setForeground(LaravelTheme.MUTED_TEXT);
+        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        card.add(titleLabel);
+        card.add(valueLabel);
+        card.add(descLabel);
+
+        return card;
+    }
+
+    private JPanel createQuickActionsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
+            new EmptyBorder(20, 24, 24, 24)
+        ));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+
+        // Section title
+        JLabel titleLabel = new JLabel("Quick Actions");
+        titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
+        titleLabel.setForeground(LaravelTheme.TEXT_DARK);
+
+        // Actions grid
+        JPanel actionsGrid = new JPanel(new GridLayout(1, 2, 16, 0));
+        actionsGrid.setBackground(Color.WHITE);
+        actionsGrid.setBorder(BorderFactory.createEmptyBorder(16, 0, 0, 0));
+
+        // Add action buttons (removed View Borrowed since it was related to transactions)
+        actionsGrid.add(createActionButton("Browse Books", "Explore our collection of books"));
+        actionsGrid.add(createActionButton("Update Profile", "Manage your account settings"));
+
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(actionsGrid, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createActionButton(String title, String description) {
+        JPanel button = new JPanel();
+        button.setLayout(new BoxLayout(button, BoxLayout.Y_AXIS));
+        button.setBackground(new Color(249, 250, 251));
+        button.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(LaravelTheme.BORDER_GRAY, 1, true),
+            new EmptyBorder(16, 16, 16, 16)
+        ));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Title
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Inter", Font.BOLD, 14));
+        titleLabel.setForeground(LaravelTheme.TEXT_DARK);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Description
+        JLabel descLabel = new JLabel(description);
+        descLabel.setFont(new Font("Inter", Font.PLAIN, 13));
+        descLabel.setForeground(LaravelTheme.MUTED_TEXT);
+        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        descLabel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
+
+        button.add(titleLabel);
+        button.add(descLabel);
+
+        return button;
     }
 } 
