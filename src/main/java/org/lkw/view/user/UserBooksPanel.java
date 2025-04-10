@@ -18,12 +18,12 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 
 public class UserBooksPanel extends JPanel {
-    private static final int MIN_GRID_COLUMNS = 5;
+    private static final int MIN_GRID_COLUMNS = 7;
     private static final int GRID_HGAP = 20;
     private static final int GRID_VGAP = 20;
     private static final int BOOK_CARD_WIDTH = 180;
     private static final int BOOK_CARD_HEIGHT = 280;
-    private static final int DETAILS_PANEL_WIDTH = 300;
+    private static final int DETAILS_PANEL_WIDTH = 280;
     private static final int CONTAINER_PADDING = 20;
     
     private final BookDAO bookDAO;
@@ -181,7 +181,7 @@ public class UserBooksPanel extends JPanel {
         // Create scroll pane
         JScrollPane scrollPane = new JScrollPane(
             booksGridPanel,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.VERTICAL_SCROLLBAR_NEVER,
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
         scrollPane.setBorder(null);
@@ -366,23 +366,7 @@ public class UserBooksPanel extends JPanel {
 
         contentWrapper.add(infoPanel);
 
-        // Borrow button panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setBorder(new EmptyBorder(0, 0, 8, 0));
-        buttonPanel.setMaximumSize(new Dimension(DETAILS_PANEL_WIDTH, 40));  // Fixed height for button area
-        
-        JButton borrowButton = new JButton("Borrow Book");
-        LaravelTheme.stylePrimaryButton(borrowButton);
-        borrowButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        borrowButton.setEnabled(book.isAvailable());
-        if (!book.isAvailable()) {
-            borrowButton.setText("Not Available");
-        }
-        buttonPanel.add(borrowButton);
-        contentWrapper.add(buttonPanel);
-
-        // Add glue at top and bottom to center the content vertically
+        // Remove borrow button panel and related code
         detailsPanel.add(Box.createVerticalGlue());
         detailsPanel.add(contentWrapper);
         detailsPanel.add(Box.createVerticalGlue());
@@ -452,18 +436,27 @@ public class UserBooksPanel extends JPanel {
         gbc.insets = new Insets(0, 0, GRID_VGAP, GRID_HGAP);
 
         int column = 0;
+        int lastRow = -1;
         for (Book book : currentBooks) {
+            int currentRow = column / MIN_GRID_COLUMNS;
             gbc.gridx = column % MIN_GRID_COLUMNS;
-            gbc.gridy = column / MIN_GRID_COLUMNS;
+            gbc.gridy = currentRow;
+            
+            // Reset weightx for each cell in the row
+            gbc.weightx = 0.0;
+            
+            // Add the book card
             booksGridPanel.add(createBookCard(book), gbc);
             column++;
+            lastRow = currentRow;
         }
 
-        // Add filler component to push everything to the left
+        // Add filler component to push everything to the left and top
         gbc.gridx = MIN_GRID_COLUMNS;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
+        gbc.gridheight = lastRow + 1;  // Span all rows
         gbc.fill = GridBagConstraints.BOTH;
         booksGridPanel.add(Box.createGlue(), gbc);
 
@@ -477,15 +470,5 @@ public class UserBooksPanel extends JPanel {
 
     private void filterBooks() {
         loadBooks();
-    }
-
-    private void borrowBook(Book book) {
-        // TODO: Implement book borrowing functionality
-        JOptionPane.showMessageDialog(
-            this,
-            "Borrowing functionality will be implemented soon.",
-            "Not Implemented",
-            JOptionPane.INFORMATION_MESSAGE
-        );
     }
 } 
