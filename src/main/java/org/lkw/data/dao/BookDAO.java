@@ -50,7 +50,7 @@ public class BookDAO {
         return books;
     }
     
-    // Get all categories
+    // get all categories
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT * FROM categories ORDER BY category_name";
@@ -75,7 +75,7 @@ public class BookDAO {
         return categories;
     }
     
-    // Get all genres
+    // get all genres
     public List<Genre> getAllGenres() {
         List<Genre> genres = new ArrayList<>();
         String sql = "SELECT * FROM genres ORDER BY genre_name";
@@ -99,7 +99,7 @@ public class BookDAO {
         return genres;
     }
     
-    // Add a new book
+    // add new book
     public boolean addBook(Book book) {
         String sql = "INSERT INTO books (title, author, isbn, publisher_id, publication_year, " +
                     "category_id, genre_id, copies_available, total_copies, cover_image) " +
@@ -127,7 +127,7 @@ public class BookDAO {
         }
     }
     
-    // Update an existing book
+    // edit existing book
     public void updateBook(Book book) {
         String sql = "UPDATE books SET title = ?, author = ?, isbn = ?, publisher = ?, publication_year = ?, " +
                     "copies_available = ?, category_id = ?, genre_id = ? WHERE book_id = ?";
@@ -152,7 +152,7 @@ public class BookDAO {
         }
     }
     
-    // Delete a book
+    // delete a book
     public boolean deleteBook(int bookId) {
         String sql = "DELETE FROM books WHERE book_id = ?";
         
@@ -168,7 +168,7 @@ public class BookDAO {
         }
     }
     
-    // Search books by title, author, or ISBN
+    // search book function
     public List<Book> searchBooks(String query, String category, String genre) {
         List<Book> books = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
@@ -181,7 +181,7 @@ public class BookDAO {
         );
         List<Object> params = new ArrayList<>();
 
-        // Add search condition if query is not empty
+        // search condition
         if (query != null && !query.trim().isEmpty()) {
             sql.append(" AND (b.title LIKE ? OR b.author LIKE ? OR b.isbn LIKE ?)");
             String searchPattern = "%" + query.trim() + "%";
@@ -190,25 +190,23 @@ public class BookDAO {
             params.add(searchPattern);
         }
 
-        // Add category filter if specified
+        // filter for category
         if (category != null && !category.isEmpty() && !"All Categories".equals(category)) {
             sql.append(" AND c.category_name = ?");
             params.add(category);
         }
 
-        // Add genre filter if specified
+        // filter for genre
         if (genre != null && !genre.isEmpty() && !"All Genres".equals(genre)) {
             sql.append(" AND g.genre_name = ?");
             params.add(genre);
         }
 
-        // Order by title
         sql.append(" ORDER BY b.title");
 
         try (Connection conn = DBConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
             
-            // Set parameters
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
@@ -228,12 +226,10 @@ public class BookDAO {
                 book.setTotalCopies(rs.getInt("total_copies"));
                 book.setDateAdded(rs.getString("date_added"));
                 
-                // Set names directly from the join results
                 book.setCategoryName(rs.getString("category_name"));
                 book.setGenreName(rs.getString("genre_name"));
                 book.setPublisherName(rs.getString("publisher_name"));
                 
-                // Get cover image if exists
                 byte[] coverData = rs.getBytes("cover_image");
                 if (coverData != null) {
                     book.setCoverImage(coverData);
@@ -248,12 +244,11 @@ public class BookDAO {
         return books;
     }
 
-    // Keep the original method for backward compatibility
     public List<Book> searchBooks(String query) {
         return searchBooks(query, null, null);
     }
     
-    // Get books by category
+    // get books by category
     public List<Book> getBooksByCategory(int categoryId) {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM books WHERE category_id = ? ORDER BY date_added DESC";
@@ -290,7 +285,7 @@ public class BookDAO {
         return books;
     }
     
-    // Get books by genre
+    // get books by genre
     public List<Book> getBooksByGenre(int genreId) {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM books WHERE genre_id = ? ORDER BY date_added DESC";
@@ -354,7 +349,6 @@ public class BookDAO {
         return publishers;
     }
 
-    // Dashboard statistics methods
     public int getTotalBooks() {
         String sql = "SELECT COUNT(*) FROM books";
         try (Connection conn = DBConnection.connect();
@@ -412,7 +406,6 @@ public class BookDAO {
     }
 
     public int getOverdueBooks() {
-        // Return 0 since borrowings functionality is not implemented yet
         return 0;
     }
 
@@ -434,7 +427,6 @@ public class BookDAO {
                 activity.put("type", rs.getString("type"));
                 activity.put("description", rs.getString("description"));
                 
-                // Format the date
                 java.sql.Timestamp timestamp = rs.getTimestamp("date");
                 String formattedDate;
                 if (timestamp != null) {
@@ -570,68 +562,6 @@ public class BookDAO {
         }
         
         return activities;
-    }
-
-    public boolean borrowBook(int bookId, int userId) {
-        // First check if the book is available
-        String checkSql = "SELECT copies_available FROM books WHERE book_id = ?";
-        
-        try (Connection conn = DBConnection.connect()) {
-            // Check book availability
-            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
-                checkStmt.setInt(1, bookId);
-                ResultSet rs = checkStmt.executeQuery();
-                
-                if (!rs.next() || rs.getInt("copies_available") <= 0) {
-                    return false;
-                }
-            }
-            
-            // Start transaction
-            conn.setAutoCommit(false);
-            
-            try {
-                // Insert borrowing record
-                String borrowSql = """
-                    INSERT INTO borrowings (book_id, user_id, borrow_date, due_date)
-                    VALUES (?, ?, CURRENT_TIMESTAMP, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 14 DAY))
-                    """;
-                
-                try (PreparedStatement borrowStmt = conn.prepareStatement(borrowSql)) {
-                    borrowStmt.setInt(1, bookId);
-                    borrowStmt.setInt(2, userId);
-                    borrowStmt.executeUpdate();
-                }
-                
-                // Update book availability
-                String updateSql = """
-                    UPDATE books 
-                    SET copies_available = copies_available - 1
-                    WHERE book_id = ? AND copies_available > 0
-                    """;
-                
-                try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-                    updateStmt.setInt(1, bookId);
-                    updateStmt.executeUpdate();
-                }
-                
-                // Commit transaction
-                conn.commit();
-                return true;
-                
-            } catch (SQLException e) {
-                // Rollback transaction on error
-                conn.rollback();
-                e.printStackTrace();
-                return false;
-            } finally {
-                // Reset auto-commit
-                conn.setAutoCommit(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public List<Book> searchBooksByTitle(String title) {

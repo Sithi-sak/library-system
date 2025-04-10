@@ -70,7 +70,6 @@ public class BooksPanel extends JPanel {
         setBorder(new EmptyBorder(20, 20, 20, 20));
         setBackground(Color.WHITE);
 
-        // Top panel with filters
         JPanel filterPanel = LaravelTheme.createPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -117,7 +116,6 @@ public class BooksPanel extends JPanel {
 
         filterPanel.add(filtersRow);
 
-        // Main content split
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.8);
         splitPane.setEnabled(false);
@@ -125,11 +123,10 @@ public class BooksPanel extends JPanel {
         splitPane.setDividerSize(0); // Remove the divider completely
         splitPane.setBackground(Color.WHITE);
 
-        // Left panel with table
+        // Left panel
         JPanel leftPanel = LaravelTheme.createPanel();
         leftPanel.setLayout(new BorderLayout());
         
-        // Table setup
         tableModel = new DefaultTableModel(
             new String[]{"Title", "Author", "Category", "Genre", "Available", "Total"},
             0
@@ -186,12 +183,12 @@ public class BooksPanel extends JPanel {
         buttonPanel.add(cancelButton);
         leftPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Right panel with book details
+        // book detail panel
         JPanel rightPanel = LaravelTheme.createPanel();
         rightPanel.setLayout(new BorderLayout(0, 20));
         rightPanel.setBorder(new EmptyBorder(0, 20, 0, 0));
 
-        // Book details form
+        // book details form
         JPanel detailsPanel = LaravelTheme.createCard();
         detailsPanel.setLayout(new GridBagLayout());
 
@@ -199,16 +196,13 @@ public class BooksPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Form fields
         titleField = createFormField(detailsPanel, "Title:", gbc, 0);
         authorField = createFormField(detailsPanel, "Author:", gbc, 1);
         isbnField = createFormField(detailsPanel, "ISBN:", gbc, 2);
         
-        // Publisher combo
         publisherComboBox = createFormComboBox(detailsPanel, "Publisher:", gbc, 3);
-        loadPublishers(); // Load publishers into combo box
+        loadPublishers();
         
-        // Publication Year field
         gbc.gridx = 0;
         gbc.gridy = 4;
         JLabel yearLabel = new JLabel("Publication Year:");
@@ -220,13 +214,11 @@ public class BooksPanel extends JPanel {
         LaravelTheme.styleTextField(yearField);
         detailsPanel.add(yearField, gbc);
         
-        // Category and Genre combos
         categoryComboBox = createFormComboBox(detailsPanel, "Category:", gbc, 5);
         genreComboBox = createFormComboBox(detailsPanel, "Genre:", gbc, 6);
-        loadCategories(); // Load categories into combo box
-        loadGenres(); // Load genres into combo box
+        loadCategories();
+        loadGenres();
         
-        // Copies spinner
         gbc.gridx = 0;
         gbc.gridy = 7;
         JLabel copiesLabel = new JLabel("Copies:");
@@ -240,7 +232,6 @@ public class BooksPanel extends JPanel {
         ((JSpinner.DefaultEditor) copiesSpinner.getEditor()).getTextField().setFont(new Font("Inter", Font.PLAIN, 13));
         detailsPanel.add(copiesSpinner, gbc);
 
-        // Cover image panel
         JPanel coverPanel = LaravelTheme.createCard();
         coverPanel.setLayout(new BorderLayout(5, 10));
         
@@ -257,23 +248,18 @@ public class BooksPanel extends JPanel {
         coverPanel.add(coverImageLabel, BorderLayout.CENTER);
         coverPanel.add(chooseImageButton, BorderLayout.SOUTH);
 
-        // Add components to right panel
         rightPanel.add(detailsPanel, BorderLayout.NORTH);
         rightPanel.add(coverPanel, BorderLayout.CENTER);
 
-        // Add panels to split pane
         splitPane.setLeftComponent(leftPanel);
         splitPane.setRightComponent(rightPanel);
 
-        // Add components to main panel
         add(filterPanel, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
 
-        // Load initial data
         loadBooks();
         updateButtonStates();
 
-        // Update event listeners
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -284,7 +270,6 @@ public class BooksPanel extends JPanel {
         categoryFilterBox.addActionListener(e -> {
             String selectedCategory = (String) categoryFilterBox.getSelectedItem();
             if (selectedCategory != null) {
-                // Update genre filter based on category
                 genreFilterBox.removeAllItems();
                 genreFilterBox.addItem("All Genres");
                 
@@ -330,13 +315,11 @@ public class BooksPanel extends JPanel {
         
         cancelButton.addActionListener(e -> {
             if (selectedBookId != -1) {
-                // If editing existing book, restore its details
                 Book book = bookDAO.getBookById(selectedBookId);
                 if (book != null) {
                     showBookDetails(book);
                 }
             } else {
-                // If adding new book, just clear the form
                 clearForm();
             }
             setEditingMode(false);
@@ -345,7 +328,6 @@ public class BooksPanel extends JPanel {
         deleteButton.addActionListener(e -> deleteBook());
         chooseImageButton.addActionListener(e -> chooseImage());
 
-        // Initialize button states
         setEditingMode(false);
     }
 
@@ -401,7 +383,6 @@ public class BooksPanel extends JPanel {
                 genreComboBox.setSelectedItem(genre.getGenreName());
             }
             
-            // Load cover image
             byte[] coverImage = book.getCoverImage();
             if (coverImage != null && coverImage.length > 0) {
                 try {
@@ -417,7 +398,6 @@ public class BooksPanel extends JPanel {
                 coverImageLabel.setIcon(null);
             }
             
-            // Disable fields if not in editing mode
             setEditingMode(false);
         }
     }
@@ -433,14 +413,12 @@ public class BooksPanel extends JPanel {
             Category bookCategory = categoryDAO.getCategoryById(book.getCategoryId());
             Genre bookGenre = genreDAO.getGenreById(book.getGenreId());
             
-            // Skip if category doesn't match filter
-            if (selectedCategory != null && !selectedCategory.equals("All Categories") && 
+            if (selectedCategory != null && !selectedCategory.equals("All Categories") &&
                 (bookCategory == null || !bookCategory.getCategoryName().equals(selectedCategory))) {
                 continue;
             }
             
-            // Skip if genre doesn't match filter
-            if (selectedGenre != null && !selectedGenre.equals("All Genres") && 
+            if (selectedGenre != null && !selectedGenre.equals("All Genres") &&
                 (bookGenre == null || !bookGenre.getGenreName().equals(selectedGenre))) {
                 continue;
             }
@@ -494,7 +472,6 @@ public class BooksPanel extends JPanel {
         String isbn = isbnField.getText().trim();
         int copies = (int) copiesSpinner.getValue();
         
-        // Validate year input
         String yearText = yearField.getText().trim();
         int year;
         try {
@@ -523,7 +500,6 @@ public class BooksPanel extends JPanel {
             return;
         }
 
-        // Get IDs from selected names
         String categoryName = (String) categoryComboBox.getSelectedItem();
         String genreName = (String) genreComboBox.getSelectedItem();
         String publisherName = (String) publisherComboBox.getSelectedItem();
@@ -553,7 +529,7 @@ public class BooksPanel extends JPanel {
         book.setAuthor(author);
         book.setIsbn(isbn);
         book.setCopiesAvailable(copies);
-        book.setTotalCopies(copies); // For new books, total copies equals available copies
+        book.setTotalCopies(copies);
         book.setPublicationYear(year);
         book.setCategoryId(category.getCategoryId());
         book.setGenreId(genre.getGenreId());
@@ -562,11 +538,9 @@ public class BooksPanel extends JPanel {
         // Handle image
         if (selectedImagePath != null) {
             try {
-                // Read the image file into a byte array
                 byte[] imageData = Files.readAllBytes(Paths.get(selectedImagePath));
-                book.setCoverImage(imageData); // Set the actual image data
+                book.setCoverImage(imageData);
                 
-                // Save a copy in the covers directory for backup
                 String fileName = Paths.get(selectedImagePath).getFileName().toString();
                 Path targetPath = Paths.get("covers", fileName);
                 Files.createDirectories(Paths.get("covers"));
@@ -580,7 +554,6 @@ public class BooksPanel extends JPanel {
                 return;
             }
         } else if (selectedBookId != -1) {
-            // If editing and no new image selected, keep the existing image
             Book existingBook = bookDAO.getBookById(selectedBookId);
             if (existingBook != null) {
                 book.setCoverImage(existingBook.getCoverImage());
@@ -589,14 +562,11 @@ public class BooksPanel extends JPanel {
 
         boolean success;
         if (selectedBookId == -1) {
-            // Add new book
             success = bookDAO.addBook(book);
         } else {
-            // Update existing book
             book.setBookId(selectedBookId);
             Book existingBook = bookDAO.getBookById(selectedBookId);
             if (existingBook != null) {
-                // When editing, update total copies if available copies increased
                 int newTotal = Math.max(existingBook.getTotalCopies(), copies);
                 book.setTotalCopies(newTotal);
             }
@@ -612,18 +582,15 @@ public class BooksPanel extends JPanel {
             loadBooks();
             setEditingMode(false);
             if (selectedBookId != -1) {
-                // If we were editing, reload the book details
                 Book updatedBook = bookDAO.getBookById(selectedBookId);
                 if (updatedBook != null) {
                     showBookDetails(updatedBook);
                 }
             } else {
-                // If we were adding, clear the form
                 clearForm();
                 selectedBookId = -1;
             }
             
-            // Refresh dashboard if this panel is part of AdminView
             Container parent = getParent();
             while (parent != null && !(parent instanceof AdminView)) {
                 parent = parent.getParent();
@@ -654,7 +621,6 @@ public class BooksPanel extends JPanel {
                     selectedBookId = -1;
                     updateButtonStates();
                     
-                    // Refresh dashboard if this panel is part of AdminView
                     Container parent = getParent();
                     while (parent != null && !(parent instanceof AdminView)) {
                         parent = parent.getParent();
@@ -732,20 +698,17 @@ public class BooksPanel extends JPanel {
             Category bookCategory = categoryDAO.getCategoryById(book.getCategoryId());
             Genre bookGenre = genreDAO.getGenreById(book.getGenreId());
             
-            // Skip if category doesn't match filter
-            if (selectedCategory != null && !selectedCategory.equals("All Categories") && 
+            if (selectedCategory != null && !selectedCategory.equals("All Categories") &&
                 (bookCategory == null || !bookCategory.getCategoryName().equals(selectedCategory))) {
                 continue;
             }
             
-            // Skip if genre doesn't match filter
-            if (selectedGenre != null && !selectedGenre.equals("All Genres") && 
+            if (selectedGenre != null && !selectedGenre.equals("All Genres") &&
                 (bookGenre == null || !bookGenre.getGenreName().equals(selectedGenre))) {
                 continue;
             }
             
-            // Skip if search text doesn't match
-            if (!searchText.isEmpty() && 
+            if (!searchText.isEmpty() &&
                 !book.getTitle().toLowerCase().contains(searchText) && 
                 !book.getAuthor().toLowerCase().contains(searchText)) {
                 continue;
@@ -779,7 +742,6 @@ public class BooksPanel extends JPanel {
     private void setEditingMode(boolean editing) {
         isEditing = editing;
         
-        // Enable/disable form fields
         titleField.setEnabled(editing);
         authorField.setEnabled(editing);
         isbnField.setEnabled(editing);
@@ -789,14 +751,12 @@ public class BooksPanel extends JPanel {
         genreComboBox.setEnabled(editing);
         copiesSpinner.setEnabled(editing);
         
-        // Show/hide appropriate buttons
         addButton.setVisible(!editing);
         editButton.setVisible(!editing);
         deleteButton.setVisible(!editing);
         saveButton.setVisible(editing);
         cancelButton.setVisible(editing);
         
-        // Update button states
         updateButtonStates();
     }
 } 

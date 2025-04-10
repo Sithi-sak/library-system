@@ -16,25 +16,20 @@ public class LoginView extends JFrame {
     private final JComboBox<String> roleComboBox;
 
     public LoginView() {
-        // Set FlatLaf look and feel
         FlatLightLaf.setup();
 
-        // Set up the frame
         setTitle("Library Management - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Main panel with white background
         JPanel mainPanel = LaravelTheme.createPanel();
         mainPanel.setLayout(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
-        // Header
         JLabel headerLabel = new JLabel("Library System", JLabel.CENTER);
         LaravelTheme.styleTitle(headerLabel);
         headerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
         mainPanel.add(headerLabel, BorderLayout.NORTH);
 
-        // Form panel - using GridBagLayout for proper alignment
         JPanel formPanel = LaravelTheme.createPanel();
         formPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -43,7 +38,6 @@ public class LoginView extends JFrame {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1.0;
 
-        // Username field
         JLabel usernameLabel = new JLabel("Username");
         LaravelTheme.styleLabel(usernameLabel, false);
         gbc.insets = new Insets(0, 0, 4, 0);
@@ -54,7 +48,6 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(0, 0, 15, 0);
         formPanel.add(usernameField, gbc);
 
-        // Password field
         JLabel passwordLabel = new JLabel("Password");
         LaravelTheme.styleLabel(passwordLabel, false);
         gbc.insets = new Insets(0, 0, 4, 0);
@@ -65,7 +58,6 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(0, 0, 15, 0);
         formPanel.add(passwordField, gbc);
 
-        // Role selection
         JLabel roleLabel = new JLabel("Login as");
         LaravelTheme.styleLabel(roleLabel, false);
         gbc.insets = new Insets(0, 0, 4, 0);
@@ -77,7 +69,6 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(0, 0, 20, 0);
         formPanel.add(roleComboBox, gbc);
 
-        // Button panel
         JPanel buttonPanel = LaravelTheme.createPanel();
         buttonPanel.setLayout(new GridLayout(1, 2, 12, 0));
 
@@ -92,13 +83,10 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(0, 0, 0, 0);
         formPanel.add(buttonPanel, gbc);
 
-        // Add form to main panel with center alignment
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // Set the content pane
         setContentPane(mainPanel);
 
-        // Size and center the window
         pack();
         setLocationRelativeTo(null);
     }

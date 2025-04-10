@@ -25,7 +25,6 @@ public class User {
         this.email = email;
     }
 
-    // Getters and Setters
     public int getUserId() {
         return userId;
     }

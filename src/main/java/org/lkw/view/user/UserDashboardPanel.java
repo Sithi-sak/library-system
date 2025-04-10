@@ -18,23 +18,18 @@ public class UserDashboardPanel extends JPanel {
         setBackground(LaravelTheme.BACKGROUND_COLOR);
         setBorder(new EmptyBorder(CONTAINER_PADDING, CONTAINER_PADDING, CONTAINER_PADDING, CONTAINER_PADDING));
 
-        // Create main content panel with vertical layout
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
 
-        // Add welcome section
         contentPanel.add(createWelcomePanel());
         contentPanel.add(Box.createVerticalStrut(20));
 
-        // Add statistics section
         contentPanel.add(createStatisticsPanel());
         contentPanel.add(Box.createVerticalStrut(20));
 
-        // Add quick actions section
         contentPanel.add(createQuickActionsPanel());
 
-        // Wrap content panel in another panel to prevent stretching
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         wrapperPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         wrapperPanel.add(contentPanel, BorderLayout.NORTH);
@@ -51,12 +46,10 @@ public class UserDashboardPanel extends JPanel {
         ));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
-        // Welcome message
         JLabel welcomeLabel = new JLabel("Welcome back, " + currentUser.getUsername() + "!");
         welcomeLabel.setFont(new Font("Inter", Font.BOLD, 24));
         welcomeLabel.setForeground(LaravelTheme.TEXT_DARK);
 
-        // Subtitle
         JLabel subtitleLabel = new JLabel("Here's an overview of your library activity");
         subtitleLabel.setFont(new Font("Inter", Font.PLAIN, 14));
         subtitleLabel.setForeground(LaravelTheme.MUTED_TEXT);
@@ -77,7 +70,6 @@ public class UserDashboardPanel extends JPanel {
         panel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
-        // Add stat cards (removed fines since transactions are removed)
         panel.add(createStatCard("Currently Borrowed", "0", "Books you have checked out"));
         panel.add(createStatCard("Overdue", "0", "Books past their due date"));
 
@@ -93,20 +85,17 @@ public class UserDashboardPanel extends JPanel {
             new EmptyBorder(16, 16, 16, 16)
         ));
 
-        // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Inter", Font.BOLD, 14));
         titleLabel.setForeground(LaravelTheme.TEXT_DARK);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Value
         JLabel valueLabel = new JLabel(value);
         valueLabel.setFont(new Font("Inter", Font.BOLD, 24));
         valueLabel.setForeground(LaravelTheme.PRIMARY_RED);
         valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         valueLabel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 
-        // Description
         JLabel descLabel = new JLabel(description);
         descLabel.setFont(new Font("Inter", Font.PLAIN, 13));
         descLabel.setForeground(LaravelTheme.MUTED_TEXT);
@@ -128,17 +117,14 @@ public class UserDashboardPanel extends JPanel {
         ));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
 
-        // Section title
         JLabel titleLabel = new JLabel("Quick Actions");
         titleLabel.setFont(new Font("Inter", Font.BOLD, 16));
         titleLabel.setForeground(LaravelTheme.TEXT_DARK);
 
-        // Actions grid
         JPanel actionsGrid = new JPanel(new GridLayout(1, 2, 16, 0));
         actionsGrid.setBackground(Color.WHITE);
         actionsGrid.setBorder(BorderFactory.createEmptyBorder(16, 0, 0, 0));
 
-        // Add action buttons (removed View Borrowed since it was related to transactions)
         actionsGrid.add(createActionButton("Browse Books", "Explore our collection of books"));
         actionsGrid.add(createActionButton("Update Profile", "Manage your account settings"));
 
@@ -158,13 +144,11 @@ public class UserDashboardPanel extends JPanel {
         ));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Inter", Font.BOLD, 14));
         titleLabel.setForeground(LaravelTheme.TEXT_DARK);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Description
         JLabel descLabel = new JLabel(description);
         descLabel.setFont(new Font("Inter", Font.PLAIN, 13));
         descLabel.setForeground(LaravelTheme.MUTED_TEXT);

@@ -24,7 +24,6 @@ public class UserSettingsPanel extends JPanel {
     private JCheckBox newArrivalsCheck;
     private final Preferences userPrefs;
 
-    // Design constants
     private static final int CONTAINER_WIDTH = 640;
     private static final int FIELD_HEIGHT = 36;
     private static final int SECTION_SPACING = 32;
@@ -45,20 +44,17 @@ public class UserSettingsPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // Create main container
         JPanel mainContainer = new JPanel();
         mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.Y_AXIS));
         mainContainer.setBackground(Color.WHITE);
         mainContainer.setBorder(new EmptyBorder(40, 0, 40, 0));
 
-        // Center panel to hold all sections
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         centerPanel.setMaximumSize(new Dimension(CONTAINER_WIDTH, Integer.MAX_VALUE));
 
-        // Add sections
         centerPanel.add(createSection("Personal Information", createPersonalInfoPanel()));
         centerPanel.add(Box.createVerticalStrut(SECTION_SPACING));
         centerPanel.add(createSection("Change Password", createPasswordPanel()));
@@ -66,7 +62,6 @@ public class UserSettingsPanel extends JPanel {
         centerPanel.add(createSection("Notification Preferences", createNotificationPanel()));
         centerPanel.add(Box.createVerticalStrut(SECTION_SPACING));
 
-        // Add save button
         JButton saveButton = new JButton("Save Changes");
         styleButton(saveButton);
         saveButton.addActionListener(e -> saveSettings());
@@ -80,12 +75,10 @@ public class UserSettingsPanel extends JPanel {
 
         centerPanel.add(buttonPanel);
 
-        // Add center panel to main container with horizontal centering
         mainContainer.add(Box.createHorizontalGlue());
         mainContainer.add(centerPanel);
         mainContainer.add(Box.createHorizontalGlue());
 
-        // Add to scroll pane
         JScrollPane scrollPane = new JScrollPane(mainContainer);
         scrollPane.setBorder(null);
         scrollPane.setBackground(Color.WHITE);
@@ -104,7 +97,6 @@ public class UserSettingsPanel extends JPanel {
         section.setMaximumSize(new Dimension(CONTAINER_WIDTH, Integer.MAX_VALUE));
         section.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(HEADING_FONT);
         titleLabel.setForeground(Color.BLACK);
@@ -112,7 +104,6 @@ public class UserSettingsPanel extends JPanel {
         section.add(titleLabel);
         section.add(Box.createVerticalStrut(20));
 
-        // Content
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
         section.add(content);
 
@@ -126,7 +117,6 @@ public class UserSettingsPanel extends JPanel {
         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
         wrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, field.getPreferredSize().height + LABEL_BOTTOM_MARGIN + 20));
 
-        // Label
         JLabel label = new JLabel(labelText);
         label.setFont(LABEL_FONT);
         label.setForeground(LABEL_COLOR);
@@ -134,7 +124,6 @@ public class UserSettingsPanel extends JPanel {
         wrapper.add(label);
         wrapper.add(Box.createVerticalStrut(LABEL_BOTTOM_MARGIN));
 
-        // Field
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
         if (field instanceof JTextField || field instanceof JPasswordField) {
             field.setMaximumSize(new Dimension(Integer.MAX_VALUE, FIELD_HEIGHT));
@@ -150,12 +139,10 @@ public class UserSettingsPanel extends JPanel {
         panel.setBackground(Color.WHITE);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Create fields
         fullNameField = createStyledTextField(currentUser.getFullName());
         emailField = createStyledTextField(currentUser.getEmail());
         phoneField = createStyledTextField(currentUser.getPhoneNumber());
 
-        // Add field groups
         panel.add(createFormField("Full Name", fullNameField));
         panel.add(Box.createVerticalStrut(FIELD_SPACING));
         panel.add(createFormField("Email", emailField));
@@ -171,12 +158,10 @@ public class UserSettingsPanel extends JPanel {
         panel.setBackground(Color.WHITE);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Create fields
         currentPasswordField = createStyledPasswordField();
         newPasswordField = createStyledPasswordField();
         confirmPasswordField = createStyledPasswordField();
 
-        // Add field groups
         panel.add(createFormField("Current Password", currentPasswordField));
         panel.add(Box.createVerticalStrut(FIELD_SPACING));
         panel.add(createFormField("New Password", newPasswordField));
@@ -259,8 +244,7 @@ public class UserSettingsPanel extends JPanel {
     }
 
     private void saveSettings() {
-        // Validate fields
-        if (fullNameField.getText().trim().isEmpty() || 
+        if (fullNameField.getText().trim().isEmpty() ||
             emailField.getText().trim().isEmpty() || 
             phoneField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -270,18 +254,15 @@ public class UserSettingsPanel extends JPanel {
             return;
         }
 
-        // Update personal information
         currentUser.setFullName(fullNameField.getText().trim());
         currentUser.setEmail(emailField.getText().trim());
         currentUser.setPhoneNumber(phoneField.getText().trim());
 
-        // Handle password change if requested
         String currentPassword = new String(currentPasswordField.getPassword());
         String newPassword = new String(newPasswordField.getPassword());
         String confirmPassword = new String(confirmPasswordField.getPassword());
 
         if (!currentPassword.isEmpty()) {
-            // Verify current password
             if (!PasswordUtils.verifyPassword(currentPassword, currentUser.getPasswordHash())) {
                 JOptionPane.showMessageDialog(this,
                     "Current password is incorrect",
@@ -290,7 +271,6 @@ public class UserSettingsPanel extends JPanel {
                 return;
             }
 
-            // Verify new password
             if (!newPassword.equals(confirmPassword)) {
                 JOptionPane.showMessageDialog(this,
                     "New passwords do not match",
@@ -307,23 +287,19 @@ public class UserSettingsPanel extends JPanel {
                 return;
             }
 
-            // Update password
             currentUser.setPasswordHash(PasswordUtils.hashPassword(newPassword));
         }
 
-        // Save user preferences
         userPrefs.putBoolean("emailNotifications", emailNotificationsCheck.isSelected());
         userPrefs.putBoolean("dueDateReminders", dueDateRemindersCheck.isSelected());
         userPrefs.putBoolean("newArrivals", newArrivalsCheck.isSelected());
 
-        // Update user in database
         if (userDAO.updateUser(currentUser)) {
             JOptionPane.showMessageDialog(this,
                 "Settings saved successfully",
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE);
             
-            // Clear password fields
             currentPasswordField.setText("");
             newPasswordField.setText("");
             confirmPasswordField.setText("");

@@ -5,7 +5,6 @@ public class Category {
     private String categoryName;
     private String description;
 
-    // Getters and Setters
     public int getCategoryId() {
         return categoryId;
     }

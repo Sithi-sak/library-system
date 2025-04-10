@@ -23,7 +23,6 @@ public class AuthController {
         this.loginView = loginView;
         this.userDAO = new UserDAO();
         
-        // Set up action listeners for login view
         this.loginView.setLoginActionListener(new LoginListener());
         this.loginView.setRegisterActionListener(new OpenRegisterListener());
     }
@@ -35,26 +34,22 @@ public class AuthController {
             String password = loginView.getPassword();
             String role = loginView.getSelectedRole();
             
-            // Validate inputs
+            // validate user input
             if (username.isEmpty() || password.isEmpty()) {
                 loginView.showError("Username and password cannot be empty");
                 return;
             }
             
-            // Hash the password
             String hashedPassword = PasswordUtils.hashPassword(password);
             
-            // Attempt login
             User user = userDAO.login(username, hashedPassword);
             
             if (user != null && user.getRole().equals(role)) {
-                // Login successful
                 loginView.setVisible(false);
                 
-                // Check if login window was maximized
                 boolean wasMaximized = loginView.isWindowMaximized();
                 
-                // Open appropriate view based on role
+                // open the correct view based on role
                 if ("admin".equalsIgnoreCase(user.getRole())) {
                     // Open admin view for admin users
                     AdminView adminView = new AdminView();
@@ -65,19 +60,17 @@ public class AuthController {
                         loginView.setVisible(true);
                     });
                     
-                    // Apply maximized state if needed
                     if (wasMaximized) {
                         adminView.maximizeIfNeeded(true);
                     }
                     
                     adminView.setVisible(true);
                 } else {
-                    // Open member view for regular users
+                    // oen member view for regular users
                     mainView = new MainView();
                     mainView.setUser(user);
                     mainView.setLogoutListener(e1 -> logout());
                     
-                    // Apply maximized state if needed
                     if (wasMaximized) {
                         mainView.maximizeIfNeeded(true);
                     }
@@ -85,7 +78,6 @@ public class AuthController {
                     mainView.setVisible(true);
                 }
             } else {
-                // Login failed
                 loginView.showError("Invalid username, password, or role. Please try again or register if you don't have an account.");
             }
         }
@@ -94,14 +86,12 @@ public class AuthController {
     class OpenRegisterListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Check if login window was maximized
             boolean wasMaximized = loginView.isWindowMaximized();
             
             registerView = new RegisterView();
             registerView.setRegisterActionListener(new RegisterListener());
             registerView.setCancelActionListener(e1 -> registerView.dispose());
             
-            // Handle window closing
             registerView.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
@@ -111,7 +101,6 @@ public class AuthController {
             
             loginView.setVisible(false);
             
-            // Apply maximized state if needed
             if (wasMaximized) {
                 registerView.maximizeIfNeeded(true);
             }
@@ -123,7 +112,6 @@ public class AuthController {
     class RegisterListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Get user input
             String username = registerView.getUsername();
             String password = registerView.getPassword();
             String confirmPassword = registerView.getConfirmPassword();
@@ -132,8 +120,7 @@ public class AuthController {
             String phoneNumber = registerView.getPhoneNumber();
             String role = registerView.getSelectedRole();
             
-            // Validate inputs
-            if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || 
+            if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
                 fullName.isEmpty() || email.isEmpty()) {
                 registerView.showError("Required fields cannot be empty");
                 return;
@@ -144,13 +131,13 @@ public class AuthController {
                 return;
             }
             
-            // Check if username already exists
+            // check if username already exists
             if (userDAO.checkUsernameExists(username)) {
                 registerView.showError("Username already exists. Please choose another.");
                 return;
             }
             
-            // Create user object
+            // create user object
             User user = new User();
             user.setUsername(username);
             user.setPasswordHash(PasswordUtils.hashPassword(password));

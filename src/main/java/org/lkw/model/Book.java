@@ -19,12 +19,10 @@ public class Book {
     private String description;
     private String coverImagePath;
     
-    // Cache for category and genre names
     private String categoryName;
     private String genreName;
     private String publisherName;
 
-    // Getters and Setters
     public int getBookId() {
         return bookId;
     }

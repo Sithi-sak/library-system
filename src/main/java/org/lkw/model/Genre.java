@@ -4,7 +4,6 @@ public class Genre {
     private int genreId;
     private String genreName;
 
-    // Getters and Setters
     public int getGenreId() {
         return genreId;
     }

@@ -11,17 +11,14 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        // Set up FlatLaf look and feel
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception e) {
             System.err.println("Failed to initialize FlatLaf");
         }
         
-        // Test database connection
         try (Connection conn = DBConnection.connect()) {
             if (conn != null) {
-                // Start the application
                 SwingUtilities.invokeLater(() -> {
                     LoginView loginView = new LoginView();
                     new AuthController(loginView);

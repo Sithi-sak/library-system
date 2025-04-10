@@ -25,23 +25,18 @@ public class MainView extends JFrame {
     private final JButton logoutButton;
     private final JPanel contentPanel;
     
-    // Optional admin-only buttons
     private JButton usersButton;
     
-    // Active button tracking
     private JButton activeButton;
     
-    // User info
     private User currentUser;
     
     public MainView() {
-        // Set up the frame
         setTitle("Library Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
         setLocationRelativeTo(null);
         
-        // Initialize components
         usernameLabel = new JLabel();
         roleLabel = new JLabel();
         dashboardButton = createSidebarButton("Dashboard", true);
@@ -50,21 +45,16 @@ public class MainView extends JFrame {
         logoutButton = createSidebarButton("Logout", false);
         contentPanel = new JPanel(new BorderLayout());
         
-        // Set initial active button
         activeButton = dashboardButton;
         
-        // Set up the main layout
         setLayout(new BorderLayout());
         
-        // Create and add the sidebar
         JPanel sidebarPanel = createSidebar();
         add(sidebarPanel, BorderLayout.WEST);
         
-        // Add the content panel
         contentPanel.setBackground(LaravelTheme.BACKGROUND_COLOR);
         add(contentPanel, BorderLayout.CENTER);
         
-        // Set up button actions
         setupButtonActions();
     }
     
@@ -75,12 +65,10 @@ public class MainView extends JFrame {
         sidebarPanel.setPreferredSize(new Dimension(200, getHeight()));
         sidebarPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, LaravelTheme.BORDER_GRAY));
         
-        // Create profile section at the top
         JPanel profilePanel = new JPanel(new BorderLayout());
         profilePanel.setBackground(Color.WHITE);
         profilePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, LaravelTheme.BORDER_GRAY));
-        
-        // User info panel
+
         JPanel userInfoPanel = new JPanel();
         userInfoPanel.setLayout(new BoxLayout(userInfoPanel, BoxLayout.Y_AXIS));
         userInfoPanel.setBackground(Color.WHITE);
@@ -100,26 +88,22 @@ public class MainView extends JFrame {
         
         profilePanel.add(userInfoPanel, BorderLayout.CENTER);
         
-        // Create menu panel
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         menuPanel.setBackground(Color.WHITE);
         menuPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         
-        // Add buttons to menu panel
         menuPanel.add(dashboardButton);
         menuPanel.add(Box.createVerticalStrut(5));
         menuPanel.add(booksButton);
         menuPanel.add(Box.createVerticalStrut(5));
         menuPanel.add(settingButton);
         
-        // Style logout button
         logoutButton.setBackground(Color.WHITE);
         logoutButton.setForeground(LaravelTheme.DANGER_RED);
         logoutButton.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Add the panels to the sidebar
         sidebarPanel.add(profilePanel, BorderLayout.NORTH);
         sidebarPanel.add(menuPanel, BorderLayout.CENTER);
         sidebarPanel.add(logoutButton, BorderLayout.SOUTH);
@@ -184,7 +168,6 @@ public class MainView extends JFrame {
         });
     }
     
-    // Content display methods
     private void showDashboardContent() {
         contentPanel.removeAll();
         contentPanel.setLayout(new BorderLayout());
@@ -209,26 +192,21 @@ public class MainView extends JFrame {
         contentPanel.repaint();
     }
     
-    // Set user info and initialize dashboard
     public void setUser(User user) {
         this.currentUser = user;
         usernameLabel.setText(user.getUsername());
         
-        // Capitalize first letter of role
         String role = user.getRole();
         role = role.substring(0, 1).toUpperCase() + role.substring(1);
         roleLabel.setText("Role: " + role);
         
-        // Show the dashboard after user is set
         showDashboardContent();
     }
     
-    // Add action listeners
     public void setLogoutListener(ActionListener listener) {
         logoutButton.addActionListener(listener);
     }
     
-    // Window state methods
     public void maximizeIfNeeded(boolean shouldMaximize) {
         if (shouldMaximize) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
