@@ -129,7 +129,7 @@ public class BookDAO {
     
     // edit existing book
     public void updateBook(Book book) {
-        String sql = "UPDATE books SET title = ?, author = ?, isbn = ?, publisher = ?, publication_year = ?, " +
+        String sql = "UPDATE books SET title = ?, author = ?, isbn = ?, publisher_id = ?, publication_year = ?, " +
                     "copies_available = ?, category_id = ?, genre_id = ? WHERE book_id = ?";
         
         try (Connection conn = DBConnection.connect();
@@ -138,7 +138,7 @@ public class BookDAO {
             stmt.setString(1, book.getTitle());
             stmt.setString(2, book.getAuthor());
             stmt.setString(3, book.getIsbn());
-            stmt.setString(4, book.getPublisher());
+            stmt.setInt(4, book.getPublisherId());
             stmt.setInt(5, book.getPublicationYear());
             stmt.setInt(6, book.getCopiesAvailable());
             stmt.setInt(7, book.getCategoryId());
